@@ -11,7 +11,6 @@ const App = ({ Component, pageProps }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { ScrollTrigger } = require("gsap/ScrollTrigger");
     gsap.registerPlugin(ScrollTrigger);
 

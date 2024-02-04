@@ -26,7 +26,10 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^14.1.0",
     "@types/node": "18.19.14",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
     "autoprefixer": "^10.4.17",
     "eslint": "^8.56.0",
     "postcss": "^8.4.33",
