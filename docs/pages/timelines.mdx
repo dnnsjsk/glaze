@@ -111,15 +111,12 @@ thereby extending the timeline's scope beyond its original container.
       data-animate="tl:[-=1] to:rotate-360"
     ></div>
   </div>
-  <div class="grid gap-8">
-    <div
-      class="h-20 w-20 rounded-xl bg-rose-500"
-      data-animate="tl:main-[-=1] to:rotate-360"
-    ></div>
-    <div
-      class="h-20 w-20 rounded-xl bg-red-500"
-      data-animate="tl:main-[-=1] to:rotate-360"
-    ></div>
+  <div
+    class="tl grid gap-8"
+    data-animate="tl:main-[-=1] [&>div]:to:rotate-360|stagger-0.25"
+  >
+    <div class="h-20 w-20 rounded-xl bg-rose-500"></div>
+    <div class="h-20 w-20 rounded-xl bg-red-500"></div>
   </div>
 </div>
 ```
@@ -140,15 +137,12 @@ thereby extending the timeline's scope beyond its original container.
       data-animate="tl:[-=1] to:rotate-360"
     ></div>
   </div>
-  <div class="grid gap-8">
-    <div
-      class="h-20 w-20 rounded-xl bg-rose-500"
-      data-animate="tl:main-[-=1] to:rotate-360"
-    ></div>
-    <div
-      class="h-20 w-20 rounded-xl bg-red-500"
-      data-animate="tl:main-[-=1] to:rotate-360"
-    ></div>
+  <div
+    class="tl grid gap-8"
+    data-animate="tl:main-[-=1] [&>div]:to:rotate-360|stagger-0.25"
+  >
+    <div class="h-20 w-20 rounded-xl bg-rose-500"></div>
+    <div class="h-20 w-20 rounded-xl bg-red-500"></div>
   </div>
 </div>
 `}
