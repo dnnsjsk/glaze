@@ -1,0 +1,119 @@
+@import "colors.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nextra-primary-hue: 40deg;
+  --shiki-color-text: #bfbdb6 !important;
+  --shiki-token-function: #ffb454 !important;
+  --shiki-token-string-expression: #aad94c !important;
+  --shiki-token-keyword: #bfbdb6b3 !important;
+}
+
+html {
+  font-feature-settings: "calt", "cv02", "cv03", "cv04", "cv11";
+  font-variation-settings: normal;
+}
+
+body,
+.nx-bg-dark,
+.dark\:nx-bg-dark {
+  .dark & {
+    @apply bg-black !important;
+  }
+}
+
+:is(
+    html[class~="dark"]
+      .dark\:nx-shadow-\[0_-1px_0_rgba\(255\,255\,255\,\.1\)_inset\]
+  ) {
+  @apply dark:bg-black !important;
+}
+
+:is(
+    html[class~="light"] .dark\:nx-shadow-\[0_1px_0_rgba\(255\,255\,255,
+    \.1\)_inset\]
+  ) {
+  @apply bg-white !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-black text-black !important;
+
+  .dark & {
+    @apply text-white !important;
+  }
+}
+
+p,
+ul,
+ol {
+  @apply text-neutral-700 dark:text-neutral-300 !important;
+
+  a {
+    @apply font-bold decoration-2 hover:no-underline !important;
+  }
+}
+
+[title="Another Page"] {
+  @apply text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-100 !important;
+}
+
+.nextra-search input {
+  @apply bg-neutral-100 placeholder:text-neutral-500 dark:bg-neutral-900 dark:placeholder-neutral-400 !important;
+}
+
+kbd {
+  @apply text-neutral-500 dark:border-neutral-100/20 dark:bg-black/50 dark:text-neutral-400;
+}
+
+.nextra-code-block {
+  @apply -mx-6;
+
+  pre {
+    @apply rounded-none bg-neutral-900 px-2 md:rounded-xl !important;
+  }
+
+  & > div {
+    @apply bg-neutral-900 text-white !important;
+  }
+
+  .nextra-button {
+    @apply bg-neutral-900 text-neutral-500 hover:bg-neutral-700 hover:text-white !important;
+  }
+
+  .highlighted {
+    @apply -mx-2 px-6 !important;
+  }
+}
+
+.nextra-sidebar-container {
+  @apply dark:bg-black !important;
+}
+
+.nextra-scrollbar,
+.nextra-toc {
+  & + .nx-sticky {
+    @apply shadow-none !important;
+  }
+}
+
+.nextra-toc {
+  a {
+    @apply bg-transparent text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 !important;
+  }
+}
+
+[title="Change theme"] {
+  @apply text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900 !important;
+}
+
+footer {
+  @apply hidden;
+}

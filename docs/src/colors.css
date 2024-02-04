@@ -1,0 +1,72 @@
+.nx-text-gray-50 {
+  @apply text-neutral-50;
+}
+
+.nx-text-gray-100 {
+  @apply text-neutral-100;
+}
+
+.nx-text-gray-200 {
+  @apply text-neutral-200;
+}
+
+.nx-text-gray-300 {
+  @apply text-neutral-300;
+}
+
+.nx-text-gray-400 {
+  @apply text-neutral-400;
+}
+
+.nx-text-gray-500 {
+  @apply text-neutral-500;
+}
+
+.nx-text-gray-600 {
+  @apply text-neutral-600;
+}
+
+.nx-text-gray-700 {
+  @apply text-neutral-700;
+}
+
+.nx-text-gray-800 {
+  @apply text-neutral-800;
+}
+
+.nx-text-gray-900 {
+  @apply text-neutral-900;
+}
+
+:is(html[class~="dark"]) {
+  .dark\:nx-text-gray-50 {
+    @apply dark:text-neutral-50;
+  }
+  .dark\:nx-text-gray-100 {
+    @apply dark:text-neutral-100;
+  }
+  .dark\:nx-text-gray-200 {
+    @apply dark:text-neutral-200;
+  }
+  .dark\:nx-text-gray-300 {
+    @apply dark:text-neutral-300;
+  }
+  .dark\:nx-text-gray-400 {
+    @apply dark:text-neutral-400;
+  }
+  .dark\:nx-text-gray-500 {
+    @apply dark:text-neutral-500;
+  }
+  .dark\:nx-text-gray-600 {
+    @apply dark:text-neutral-600;
+  }
+  .dark\:nx-text-gray-700 {
+    @apply dark:text-neutral-700;
+  }
+  .dark\:nx-text-gray-800 {
+    @apply dark:text-neutral-800;
+  }
+  .dark\:nx-text-gray-900 {
+    @apply dark:text-neutral-900;
+  }
+}

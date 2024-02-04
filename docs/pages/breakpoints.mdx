@@ -1,0 +1,39 @@
+# Breakpoints
+
+Glaze features a deep integration with GSAPs
+[matchMedia](<https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/>) functionality,
+which allows you to define breakpoints and create responsive animations.
+
+## Setup
+
+To use breakpoints, you need to define them in the intialization of Glaze:
+
+```js
+new Glaze({
+  gsap: { core: gsap },
+  breakpoints: {
+    sm: "(min-width: 640px)",
+    md: "(min-width: 768px)",
+  },
+});
+```
+
+## Usage
+
+Breakpoints are defined at the start of the animation string.
+
+```html copy
+<div data-animate="@sm:from:opacity-0"></div>
+```
+
+This will animate the opacity from 0 to 1 when the screen width is 640px or
+more.
+
+You can also define multiple breakpoints:
+
+```html copy
+<div data-animate="@sm:from:opacity-0 @md:from:yPercent-10"></div>
+```
+
+This will animate the `opacity` when the screen width is `640p`x or more, and
+the `yPercent` + `opacity` when the screen width is `768px` or more.
