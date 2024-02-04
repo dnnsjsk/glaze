@@ -9,6 +9,9 @@
   },
   "devDependencies": {
     "gsap": "^3.12.5",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.11",
+    "typescript": "^5.3.3",
     "vite": "^4.4.5"
   }
 }

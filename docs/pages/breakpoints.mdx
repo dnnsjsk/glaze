@@ -1,3 +1,5 @@
+import Example from "../components/Example";
+
 # Breakpoints
 
 Glaze features a deep integration with GSAPs
@@ -23,17 +25,41 @@ new Glaze({
 Breakpoints are defined at the start of the animation string.
 
 ```html copy
-<div data-animate="@sm:from:opacity-0"></div>
+<div
+  class="h-20 w-20 rounded-xl bg-lime-500 sm:invisible"
+  data-animate="@sm:from:duration-1|autoAlpha-0|rotate-180|xPercent-[-100]|ease-power2.inOut"
+></div>
 ```
 
-This will animate the opacity from 0 to 1 when the screen width is 640px or
+<Example>
+  {`
+<div
+  class="h-20 w-20 rounded-xl bg-lime-500 sm:invisible"
+  data-animate="@sm:from:duration-1|autoAlpha-0|rotate-360|xPercent-[-100]|ease-power2.inOut|scrollTrigger.trigger-[&]"
+></div>
+`}
+</Example>
+
+This will animate all the set properties when the screen width is 640px or
 more.
 
 You can also define multiple breakpoints:
 
 ```html copy
-<div data-animate="@sm:from:opacity-0 @md:from:yPercent-10"></div>
+<div
+  class="h-20 w-20 rounded-xl bg-lime-500 sm:invisible"
+  data-animate="@sm:from:duration-1|autoAlpha-0|rotate-360|xPercent-[-100]|ease-power2.inOut @lg:from:background-[red]"
+></div>
 ```
+
+<Example>
+  {`
+<div
+  class="sm:invisible h-20 w-20 rounded-xl bg-orange-500"
+  data-animate="@sm:from:duration-1|autoAlpha-0|rotate-360|xPercent-[-100]|ease-power2.inOut|scrollTrigger.trigger-[&] @lg:from:background-[red]"
+></div>
+`}
+</Example>
 
 This will animate the `opacity` when the screen width is `640p`x or more, and
 the `yPercent` + `opacity` when the screen width is `768px` or more.

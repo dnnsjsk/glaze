@@ -214,6 +214,7 @@ class Glaze {
         return;
       }
 
+      if (!propertiesString) return;
       const properties = propertiesString.split("|");
       if (!result[rootKey]) result[rootKey] = {};
 
@@ -267,20 +268,25 @@ class Glaze {
           elementsInTimeline.push(el);
         });
 
+        const parsedData = this.parseToObject(
+            attributes
+                .filter(
+                    (attr) =>
+                        attr !== "tl" &&
+                        !attr.includes("tl/") &&
+                        !attr.endsWith(":tl"),
+                )
+                .join(" "),
+            true,
+        );
+        this.adjustValuesByKey(parsedData, ["trigger"], (value) => {
+          return this.getSelectorOrElement(element, value, true);
+        });
+
         processedElements.push(element);
         this.timelines.push({
           id: timelineData?.id || this.generateUniqueId(),
-          data: this.parseToObject(
-            attributes
-              .filter(
-                (attr) =>
-                  attr !== "tl" &&
-                  !attr.includes("tl/") &&
-                  !attr.endsWith(":tl"),
-              )
-              .join(" "),
-            true,
-          ),
+          data: parsedData,
           matchMedia: timelineData?.matchMedia || this.bp,
           elements: elementsInTimeline,
         });
@@ -408,6 +414,8 @@ class Glaze {
 
           applyAnimationSet(element, animationObject, timeline);
         });
+
+        console.log(timelines)
       },
     );
   }

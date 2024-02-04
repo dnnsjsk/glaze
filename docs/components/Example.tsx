@@ -4,9 +4,10 @@ const Example = ({ children }) => {
 
   return (
     <div className="-mx-6">
-      <div className="flex h-max w-full items-center justify-center overflow-hidden bg-neutral-900 p-12 md:rounded-xl">
-        {content ? <div dangerouslySetInnerHTML={content} /> : children}
-      </div>
+      <div
+        className="flex h-max w-full items-center justify-center overflow-hidden bg-neutral-900 p-12 md:rounded-xl"
+        dangerouslySetInnerHTML={content}
+      />
     </div>
   );
 };

@@ -1,3 +1,5 @@
+import Example from "../components/Example";
+
 # Timelines
 
 [Timelines](https://gsap.com/docs/v3/GSAP/Timeline) are fully supported in
@@ -10,7 +12,7 @@ timeline, Glaze interprets subsequent strings as options for configuring the
 timeline.
 
 ```html copy
-<div data-animate="tl defaults:ease-elastic|duration-2 yoyo-true">...</div>
+<div data-animate="tl defaults:ease-elastic|duration-1 yoyo-true">...</div>
 ```
 
 This example initiates a timeline with specified default `easing`, `duration`,
@@ -22,13 +24,34 @@ By design, Glaze incorporates all child elements of a timeline-declared element
 into the timeline's scope, eliminating the need for explicit inclusion.
 
 ```html copy
-<div data-animate="tl defaults:ease-elastic|duration-2">
-  <h1 data-animate="from:opacity-0">...</h1>
-  <p data-animate="tl-[-=0.5] from:opacity-0">...</p>
+<div class="grid gap-8" data-animate="tl defaults:ease-elastic|duration-4">
+  <div
+    class="h-20 w-20 rounded-xl bg-amber-500"
+    data-animate="to:rotate-360"
+  ></div>
+  <div
+    class="h-20 w-20 rounded-xl bg-green-500"
+    data-animate="tl:[-=3] to:rotate-360"
+  ></div>
 </div>
 ```
 
-Adjust timing for individual elements using the `tl-` prefix to delay or advance
+<Example>
+  {`
+<div class="grid gap-8" data-animate="tl defaults:ease-elastic|duration-4 scrollTrigger:trigger-[&]">
+  <div
+    class="h-20 w-20 rounded-xl bg-amber-500"
+    data-animate="to:rotate-360"
+  ></div>
+  <div
+    class="h-20 w-20 rounded-xl bg-green-500"
+    data-animate="tl:[-=3] to:rotate-360"
+  ></div>
+</div>
+`}
+</Example>
+
+Adjust timing for individual elements using the `tl:` prefix to delay or advance
 their animation start times within the timeline.
 
 ## Responsive timelines
@@ -38,11 +61,32 @@ demonstrates a timeline that activates at the `lg` breakpoint and adjusts
 individual element animations responsively.
 
 ```html copy
-<div data-animate="@lg:tl defaults:ease-elastic|duration-2">
-  <h1 data-animate="from:opacity-0">...</h1>
-  <p data-animate="tl-[-=0.5] from:opacity-0 @xl:from:y-10>...</p>
+<div class="grid gap-8" data-animate="tl defaults:power2.inOut|duration-2">
+  <div
+    class="h-20 w-20 rounded-xl bg-amber-500"
+    data-animate="to:rotate-360 @lg:to:xPercent-[50]"
+  ></div>
+  <div
+    class="h-20 w-20 rounded-xl bg-green-500"
+    data-animate="tl:[-=1] to:rotate-360 @lg:to:xPercent-[-50]"
+  ></div>
 </div>
 ```
+
+<Example>
+  {`
+<div class="grid gap-8" data-animate="tl defaults:power2.inOut|duration-2 scrollTrigger:trigger-[&]">
+  <div
+    class="h-20 w-20 rounded-xl bg-amber-500"
+    data-animate="to:rotate-360 @lg:to:xPercent-[100]"
+  ></div>
+  <div
+    class="h-20 w-20 rounded-xl bg-green-500"
+    data-animate="tl:[-=1] to:rotate-360 @lg:to:xPercent-[-100]"
+  ></div>
+</div>
+`}
+</Example>
 
 This approach ensures the timeline and its component animations adapt to varying
 screen sizes.
@@ -53,12 +97,62 @@ Assign a name to your timeline to link animations from external elements,
 thereby extending the timeline's scope beyond its original container.
 
 ```html copy
-<div data-animate="@lg:tl/main defaults:ease-elastic|duration-2">
-  <h1 data-animate="from:opacity-0">...</h1>
-  <p data-animate="tl-[-=0.5] from:opacity-0">...</p>
+<div class="grid w-full grid-cols-2 justify-items-center">
+  <div
+    class="grid gap-8"
+    data-animate="tl/main defaults:power2.inOut|duration-2"
+  >
+    <div
+      class="h-20 w-20 rounded-xl bg-amber-500"
+      data-animate="to:rotate-360"
+    ></div>
+    <div
+      class="h-20 w-20 rounded-xl bg-green-500"
+      data-animate="tl:[-=1] to:rotate-360"
+    ></div>
+  </div>
+  <div class="grid gap-8">
+    <div
+      class="h-20 w-20 rounded-xl bg-rose-500"
+      data-animate="tl:main-[-=1] to:rotate-360"
+    ></div>
+    <div
+      class="h-20 w-20 rounded-xl bg-red-500"
+      data-animate="tl:main-[-=1] to:rotate-360"
+    ></div>
+  </div>
 </div>
-<div data-animate="tl:main-[-=0.5] from:opacity-0">...</div>
 ```
+
+<Example>
+  {`
+<div class="grid w-full grid-cols-2 justify-items-center">
+  <div
+    class="grid gap-8"
+    data-animate="tl/main defaults:power2.inOut|duration-2 scrollTrigger:trigger-[&]"
+  >
+    <div
+      class="h-20 w-20 rounded-xl bg-amber-500"
+      data-animate="to:rotate-360"
+    ></div>
+    <div
+      class="h-20 w-20 rounded-xl bg-green-500"
+      data-animate="tl:[-=1] to:rotate-360"
+    ></div>
+  </div>
+  <div class="grid gap-8">
+    <div
+      class="h-20 w-20 rounded-xl bg-rose-500"
+      data-animate="tl:main-[-=1] to:rotate-360"
+    ></div>
+    <div
+      class="h-20 w-20 rounded-xl bg-red-500"
+      data-animate="tl:main-[-=1] to:rotate-360"
+    ></div>
+  </div>
+</div>
+`}
+</Example>
 
 This named timeline (`main`) allows for animations defined on other elements to
 join the timeline using the `tl:{name}` syntax.

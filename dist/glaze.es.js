@@ -1,6 +1,6 @@
-var A = Object.defineProperty;
-var y = (p, t, i) => t in p ? A(p, t, { enumerable: !0, configurable: !0, writable: !0, value: i }) : p[t] = i;
-var h = (p, t, i) => (y(p, typeof t != "symbol" ? t + "" : t, i), i);
+var y = Object.defineProperty;
+var A = (m, t, i) => t in m ? y(m, t, { enumerable: !0, configurable: !0, writable: !0, value: i }) : m[t] = i;
+var l = (m, t, i) => (A(m, typeof t != "symbol" ? t + "" : t, i), i);
 const n = class n {
   static isObject(t) {
     return t && typeof t == "object" && !Array.isArray(t);
@@ -41,27 +41,27 @@ const n = class n {
     var e;
     const i = /(?:@(\w+):)?tl(?:\/(\w+))?/, s = t.match(i);
     if (s) {
-      const c = s[1], o = { id: s[2] ?? "", matchMedia: this.bp };
+      const c = s[1], a = { id: s[2] ?? "", matchMedia: this.bp };
       if (c) {
         if (!((e = this.matchMedias) != null && e[c]))
           return null;
-        o.matchMedia = this.matchMedias[c];
+        a.matchMedia = this.matchMedias[c];
       }
-      return o;
+      return a;
     } else
       return null;
   }
   static parseMediaQueries(t) {
     const i = {};
     return t.split(" ").forEach((e) => {
-      var o;
+      var a;
       const c = e.match(/@(\w+):/);
       if (!c) {
         i[this.bp] || (i[this.bp] = []), i[this.bp].push(e);
         return;
       }
       const r = c[1];
-      (o = this.matchMedias) != null && o[r] && (i[this.matchMedias[r]] || (i[this.matchMedias[r]] = []), i[this.matchMedias[r]].push(e.replace(c[0], "")));
+      (a = this.matchMedias) != null && a[r] && (i[this.matchMedias[r]] || (i[this.matchMedias[r]] = []), i[this.matchMedias[r]].push(e.replace(c[0], "")));
     }), i;
   }
   static parseToObject(t, i = !1) {
@@ -70,30 +70,32 @@ const n = class n {
       var g;
       const r = this.getSelectorFromBracket(c);
       r && (c = r.restOfString, s.selector = {}, s.selector.value = r.content);
-      const o = c.split(":").filter((l) => !l.includes("@")), [a, u] = o;
-      if (!u && i) {
-        const l = c.split("-"), b = l[0], m = l[1];
-        if (!b || !m)
+      const a = c.split(":").filter((u) => !u.includes("@")), [h, o] = a;
+      if (!o && i) {
+        const u = c.split("-"), b = u[0], p = u[1];
+        if (!b || !p)
           return;
-        s[b] = this.castValue(m);
+        s[b] = this.castValue(p);
         return;
       }
-      if (a === "tl" && u.startsWith("[")) {
+      if (h === "tl" && o.startsWith("[")) {
         s.tl = {
-          value: (g = this.getSelectorFromBracket(u + ":")) == null ? void 0 : g.content
+          value: (g = this.getSelectorFromBracket(o + ":")) == null ? void 0 : g.content
         };
         return;
       }
-      const f = u.split("|");
-      s[a] || (s[a] = {}), f.forEach((l) => {
-        if (!l)
+      if (!o)
+        return;
+      const f = o.split("|");
+      s[h] || (s[h] = {}), f.forEach((u) => {
+        if (!u)
           return;
-        let [b, m] = l.split(/-(.+)/);
-        m = this.castValue(m);
+        let [b, p] = u.split(/-(.+)/);
+        p = this.castValue(p);
         const O = b.split(".");
-        let d = s[a];
+        let d = s[h];
         O.forEach((M, S) => {
-          S === O.length - 1 ? d[M] = m : (d[M] || (d[M] = {}), d = d[M]);
+          S === O.length - 1 ? d[M] = p : (d[M] || (d[M] = {}), d = d[M]);
         });
       });
     }), s;
@@ -105,24 +107,26 @@ const n = class n {
       if (c.some(
         (r) => r === "tl" || r.includes("tl/") || r.endsWith(":tl")
       )) {
-        const r = this.parseTimeline(e), o = [];
+        const r = this.parseTimeline(e), a = [];
         [
           ...this.getElements(s),
           ...r != null && r.id ? document.querySelectorAll(
             `[${this.config.dataAttribute}*="tl:${r.id}"]`
           ) : []
-        ].forEach((a) => {
-          o.push(a);
-        }), t.push(s), this.timelines.push({
+        ].forEach((o) => {
+          a.push(o);
+        });
+        const h = this.parseToObject(
+          c.filter(
+            (o) => o !== "tl" && !o.includes("tl/") && !o.endsWith(":tl")
+          ).join(" "),
+          !0
+        );
+        this.adjustValuesByKey(h, ["trigger"], (o) => this.getSelectorOrElement(s, o, !0)), t.push(s), this.timelines.push({
           id: (r == null ? void 0 : r.id) || this.generateUniqueId(),
-          data: this.parseToObject(
-            c.filter(
-              (a) => a !== "tl" && !a.includes("tl/") && !a.endsWith(":tl")
-            ).join(" "),
-            !0
-          ),
+          data: h,
           matchMedia: (r == null ? void 0 : r.matchMedia) || this.bp,
-          elements: o
+          elements: a
         });
         return;
       }
@@ -131,15 +135,15 @@ const n = class n {
       if (t.includes(s))
         return;
       const e = (c = this.timelines.find(
-        (r) => r.elements.some((o) => o === s) && r.matchMedia
+        (r) => r.elements.some((a) => a === s) && r.matchMedia
       )) == null ? void 0 : c.matchMedia;
       this.elements.push(
         ...Object.entries(
           this.parseMediaQueries(this.getAttribute(s))
-        ).map(([r, o]) => ({
+        ).map(([r, a]) => ({
           matchMedia: r ?? e,
           element: s,
-          data: this.parseToObject(o.join(" "))
+          data: this.parseToObject(a.join(" "))
         }))
       );
     }), this.elements.forEach((s) => {
@@ -155,8 +159,8 @@ const n = class n {
   }
   static init() {
     const t = this.gsap.matchMedia(), i = (s, e, c) => {
-      var o;
-      const r = e.tl ? (o = Object.values(e.tl)) == null ? void 0 : o[0] : void 0;
+      var a;
+      const r = e.tl ? (a = Object.values(e.tl)) == null ? void 0 : a[0] : void 0;
       if (e.to && e.from) {
         c ? c.fromTo(
           this.getSelectorOrElement(s, e),
@@ -171,12 +175,12 @@ const n = class n {
         return;
       }
       if (e.to || e.from) {
-        const a = e.to ? "to" : "from";
-        c ? c[a](
+        const h = e.to ? "to" : "from";
+        c ? c[h](
           this.getSelectorOrElement(s, e),
-          e[a],
+          e[h],
           r
-        ) : this.gsap[a](this.getSelectorOrElement(s, e), e[a]);
+        ) : this.gsap[h](this.getSelectorOrElement(s, e), e[h]);
       }
     };
     t.add(
@@ -195,16 +199,16 @@ const n = class n {
             timeline: r
           });
         }), this.data.forEach((c, r) => {
-          var u;
-          let o = {};
+          var o;
+          let a = {};
           Object.entries(c).forEach(([f, g]) => {
-            var l;
-            (l = s.conditions) != null && l[f] && (o = this.mergeDeep(o, g));
-          }), this.adjustValuesByKey(o, ["trigger"], (f) => this.getSelectorOrElement(r, f, !0));
-          const a = (u = e.find(
+            var u;
+            (u = s.conditions) != null && u[f] && (a = this.mergeDeep(a, g));
+          }), this.adjustValuesByKey(a, ["trigger"], (f) => this.getSelectorOrElement(r, f, !0));
+          const h = (o = e.find(
             ({ elements: f }) => f.includes(r)
-          )) == null ? void 0 : u.timeline;
-          i(r, o, a);
+          )) == null ? void 0 : o.timeline;
+          i(r, a, h);
         });
       }
     );
@@ -227,15 +231,15 @@ const n = class n {
     };
   }
 };
-h(n, "bp", "(min-width: 1px)"), h(n, "gsap"), h(n, "config", {
+l(n, "bp", "(min-width: 1px)"), l(n, "gsap"), l(n, "config", {
   dataAttribute: "data-animate"
-}), h(n, "matchMedias", {}), h(n, "elements", []), h(n, "timelines", []), h(n, "data", /* @__PURE__ */ new Map()), h(n, "getAttributeString", (t = !1) => `${t ? "[" : ""}${n.config.dataAttribute}${t ? "]" : ""}`), h(n, "getAttribute", (t) => (t.getAttribute(n.getAttributeString()) || "").trim()), h(n, "getElements", (t = document) => t.querySelectorAll(n.getAttributeString(!0))), h(n, "getSelectorOrElement", (t, i, s = !1) => {
+}), l(n, "matchMedias", {}), l(n, "elements", []), l(n, "timelines", []), l(n, "data", /* @__PURE__ */ new Map()), l(n, "getAttributeString", (t = !1) => `${t ? "[" : ""}${n.config.dataAttribute}${t ? "]" : ""}`), l(n, "getAttribute", (t) => (t.getAttribute(n.getAttributeString()) || "").trim()), l(n, "getElements", (t = document) => t.querySelectorAll(n.getAttributeString(!0))), l(n, "getSelectorOrElement", (t, i, s = !1) => {
   var c;
   const e = typeof i != "string" ? (c = i == null ? void 0 : i.selector) == null ? void 0 : c.value : "";
   if (e) {
     if (e.startsWith("&")) {
-      const o = e == null ? void 0 : e.replace("&", ":scope");
-      return s ? t.querySelector(o) : t.querySelectorAll(o);
+      const a = e == null ? void 0 : e.replace("&", ":scope");
+      return s ? t.querySelector(a) : t.querySelectorAll(a);
     }
     return e;
   }
