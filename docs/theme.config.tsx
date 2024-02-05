@@ -19,7 +19,7 @@ const config: DocsThemeConfig = {
       },
     };
   },
-  docsRepositoryBase: "https://github.com/shuding/nextra-docs-template",
+  docsRepositoryBase: "https://github.com/dnnsjsk/glaze",
   head: function useHead() {
     const { title } = useConfig();
     const socialCard = "https://glaze.dev/og.jpg";

@@ -118,8 +118,26 @@ kbd {
   }
 }
 
+.nextra-search {
+  .excerpt {
+    @apply dark:text-neutral-400 !important;
+  }
+
+  a > div {
+    @apply dark:text-neutral-100 !important;
+  }
+
+  ul > div {
+    @apply dark:text-neutral-300
+  }
+}
+
 [title="Change theme"] {
   @apply text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900 !important;
+}
+
+div:has(time) {
+  @apply dark:text-neutral-400 !important;
 }
 
 footer {
