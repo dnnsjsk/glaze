@@ -3,7 +3,7 @@ import { DocsThemeConfig, useConfig } from "nextra-theme-docs";
 
 const config: DocsThemeConfig = {
   logo: (
-    <span className="text-2xl font-black tracking-tight">
+    <span className="text-2xl font-black tracking-tight text-black dark:text-white">
       🍩&nbsp;&nbsp;Glaze
     </span>
   ),
