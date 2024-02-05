@@ -1,9 +1,9 @@
 import {
-  GlazeConfig,
   GlazeAnimationCollection,
   GlazeAnimationObject,
-  PlainObject,
+  GlazeConfig,
   GlazeTimeline,
+  PlainObject,
 } from "./types.ts";
 
 class Glaze {
@@ -25,7 +25,12 @@ class Glaze {
   > = new Map();
 
   static isObject(item: PlainObject): item is PlainObject {
-    return item && typeof item === "object" && !Array.isArray(item);
+    return (
+      item &&
+      typeof item === "object" &&
+      !Array.isArray(item) &&
+      !(item instanceof HTMLElement)
+    );
   }
 
   static mergeDeep(
@@ -47,30 +52,6 @@ class Glaze {
     }
 
     return sources.length ? this.mergeDeep(target, ...sources) : target;
-  }
-
-  static adjustValuesByKey(
-    obj: PlainObject,
-    keysToAdjust: string[],
-    adjustmentFunction: (currentValue: string) => string | Element,
-  ): void {
-    Object.keys(obj).forEach((key) => {
-      if (keysToAdjust.includes(key)) {
-        obj[key] = adjustmentFunction(obj[key]);
-      } else if (
-        typeof obj[key] === "object" &&
-        obj[key] !== null &&
-        !Array.isArray(obj[key])
-      ) {
-        this.adjustValuesByKey(obj[key], keysToAdjust, adjustmentFunction);
-      } else if (Array.isArray(obj[key])) {
-        obj[key].forEach((item: PlainObject | null) => {
-          if (typeof item === "object" && item !== null) {
-            this.adjustValuesByKey(item, keysToAdjust, adjustmentFunction);
-          }
-        });
-      }
-    });
   }
 
   static generateUniqueId(): string {
@@ -120,10 +101,21 @@ class Glaze {
     return null;
   }
 
-  static castValue(value: string | null): string | number | boolean | null {
+  static castValue(
+    value: string | null,
+    element: Element,
+    key: string,
+  ): string | number | boolean | Element | null {
     if (typeof value !== "string") return value;
+    const cleanedValue = value.replace(/^\[|]$/g, "").replaceAll("_", " ");
 
-    const cleanedValue = value.replace(/^\[|]$/g, "").replaceAll('_', ' ');
+    if (cleanedValue.startsWith("&")) {
+      return this.getSelectorOrElement(
+        element,
+        value,
+        ["trigger"].includes(key),
+      );
+    }
 
     if (cleanedValue === "true" || cleanedValue === "false") {
       return cleanedValue === "true";
@@ -180,7 +172,7 @@ class Glaze {
     return results;
   }
 
-  static parseToObject(input: string, isTimeline = false) {
+  static parseToObject(input: string, isTimeline = false, element: Element) {
     // eslint-disable-next-line
     const result: Record<string, any> = {};
 
@@ -203,7 +195,7 @@ class Glaze {
         const value = obj[1];
 
         if (!key || !value) return;
-        result[key] = this.castValue(value);
+        result[key] = this.castValue(value, element, key);
         return;
       }
 
@@ -223,7 +215,7 @@ class Glaze {
         // eslint-disable-next-line
         let [key, value]: any = property.split(/-(.+)/);
 
-        value = this.castValue(value);
+        value = this.castValue(value, element, key);
 
         const keyParts = key.split(".");
         let currentObj = result[rootKey];
@@ -245,16 +237,14 @@ class Glaze {
     const processedElements: Element[] = [];
     const elements = this.getElements();
 
+    const matchesTl = (attr: string) =>
+      attr === "tl" || attr.includes("tl/") || attr.endsWith(":tl");
+
     elements.forEach((element) => {
       const data = this.getAttribute(element);
       const attributes = data.split(" ");
 
-      if (
-        attributes.some(
-          (attr) =>
-            attr === "tl" || attr.includes("tl/") || attr.endsWith(":tl"),
-        )
-      ) {
+      if (attributes.some((attr) => matchesTl(attr))) {
         const timelineData = this.parseTimeline(data);
         const elementsInTimeline: Element[] = [];
         [
@@ -269,19 +259,10 @@ class Glaze {
         });
 
         const parsedData = this.parseToObject(
-            attributes
-                .filter(
-                    (attr) =>
-                        attr !== "tl" &&
-                        !attr.includes("tl/") &&
-                        !attr.endsWith(":tl"),
-                )
-                .join(" "),
-            true,
+          attributes.filter((attr) => !matchesTl(attr)).join(" "),
+          true,
+          element,
         );
-        this.adjustValuesByKey(parsedData, ["trigger"], (value) => {
-          return this.getSelectorOrElement(element, value, true);
-        });
 
         processedElements.push(element);
         this.timelines.push({
@@ -308,7 +289,7 @@ class Glaze {
         ).map(([key, value]) => ({
           matchMedia: key ?? timelineMatchMedia,
           element,
-          data: this.parseToObject(value.join(" ")),
+          data: this.parseToObject(value.join(" "), false, element),
         })),
       );
     });
@@ -404,10 +385,6 @@ class Glaze {
             }
           });
 
-          this.adjustValuesByKey(animationObject, ["trigger"], (value) => {
-            return this.getSelectorOrElement(element, value, true);
-          });
-
           const timeline = timelines.find(({ elements }) =>
             elements.includes(element),
           )?.timeline;
@@ -415,7 +392,7 @@ class Glaze {
           applyAnimationSet(element, animationObject, timeline);
         });
 
-        console.log(timelines)
+        console.log(timelines);
       },
     );
   }
@@ -454,4 +431,4 @@ export type {
   GlazeConfig,
   GlazeTimeline,
   PlainObject,
-}
+};

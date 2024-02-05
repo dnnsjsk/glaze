@@ -4,8 +4,6 @@ import { Glaze } from "./src";
 
 gsap.registerPlugin(ScrollTrigger);
 
-console.log('hi')
-
 new Glaze({
   gsap: { core: gsap },
   breakpoints: {

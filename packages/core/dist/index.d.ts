@@ -1,4 +1,4 @@
-import { GlazeConfig, GlazeAnimationCollection, GlazeAnimationObject, PlainObject, GlazeTimeline } from "./types.ts";
+import { GlazeAnimationCollection, GlazeAnimationObject, GlazeConfig, GlazeTimeline, PlainObject } from "./types.ts";
 declare class Glaze {
     private static bp;
     private static gsap;
@@ -9,7 +9,6 @@ declare class Glaze {
     private static data;
     static isObject(item: PlainObject): item is PlainObject;
     static mergeDeep(target: PlainObject, ...sources: PlainObject[]): PlainObject;
-    static adjustValuesByKey(obj: PlainObject, keysToAdjust: string[], adjustmentFunction: (currentValue: string) => string | Element): void;
     static generateUniqueId(): string;
     static getAttributeString: (withBrackets?: boolean) => string;
     static getAttribute: (element: Element) => string;
@@ -19,7 +18,7 @@ declare class Glaze {
         content: string;
         restOfString: string;
     } | null;
-    static castValue(value: string | null): string | number | boolean | null;
+    static castValue(value: string | null, element: Element, key: string): string | number | boolean | Element | null;
     static parseTimeline(input: string): {
         id: string;
         matchMedia: string;
@@ -27,7 +26,7 @@ declare class Glaze {
     static parseMediaQueries(input: string): {
         [key: string]: string[];
     };
-    static parseToObject(input: string, isTimeline?: boolean): Record<string, any>;
+    static parseToObject(input: string, isTimeline: boolean | undefined, element: Element): Record<string, any>;
     static collect(): void;
     static init(): void;
     constructor(config: GlazeConfig);
