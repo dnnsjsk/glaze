@@ -10,6 +10,15 @@ const config: DocsThemeConfig = {
   project: {
     link: "https://github.com/dnnsjsk/glaze",
   },
+  useNextSeoProps: () => {
+    const { title } = useConfig();
+
+    return {
+      openGraph: {
+        title: title === 'Index' ? title : `${title} - Glaze`,
+      },
+    };
+  },
   docsRepositoryBase: "https://github.com/shuding/nextra-docs-template",
   head: function useHead() {
     const { title } = useConfig();
@@ -34,7 +43,6 @@ const config: DocsThemeConfig = {
         <meta name="twitter:image" content={socialCard} />
         <meta name="twitter:site:domain" content="glaze.dev" />
         <meta name="twitter:url" content="https://glaze.dev" />
-        <meta name="og:title" content={title ? title + " – Glaze" : "Glaze"} />
         <meta name="og:image" content={socialCard} />
         <meta name="apple-mobile-web-app-title" content="Glaze" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
