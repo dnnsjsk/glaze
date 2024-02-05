@@ -1,211 +1,220 @@
-function j(s, o, n = !1) {
-  var d;
-  const e = typeof o != "string" ? (d = o == null ? void 0 : o.selector) == null ? void 0 : d.value : "";
+function S(s, i, l = !1) {
+  var p;
+  const e = typeof i != "string" ? (p = i == null ? void 0 : i.selector) == null ? void 0 : p.value : "";
   if (e) {
     if (e.startsWith("&")) {
-      const p = e == null ? void 0 : e.replace("&", ":scope");
-      return n ? s.querySelector(p) : s.querySelectorAll(p);
+      const m = e == null ? void 0 : e.replace("&", ":scope");
+      return l ? s.querySelector(m) : s.querySelectorAll(m);
     }
     return e;
   }
   return s;
 }
-function S(s) {
+function W(s) {
   return s && typeof s == "object" && !Array.isArray(s) && !(s instanceof HTMLElement);
 }
-function T(s, ...o) {
-  if (!o.length)
+function $(s, ...i) {
+  if (!i.length)
     return s;
-  const n = o.shift();
-  if (S(s) && S(n))
-    for (const e in n)
-      S(n[e]) ? (s[e] || Object.assign(s, { [e]: {} }), T(s[e], n[e])) : Object.assign(s, { [e]: n[e] });
-  return o.length ? T(s, ...o) : s;
+  const l = i.shift();
+  if (W(s) && W(l))
+    for (const e in l)
+      W(l[e]) ? (s[e] || Object.assign(s, { [e]: {} }), $(s[e], l[e])) : Object.assign(s, { [e]: l[e] });
+  return i.length ? $(s, ...i) : s;
 }
-function $(s) {
-  const o = /^\[([^\]]+)]:(.*)/, n = s.match(o);
-  return n ? {
-    content: n[1],
-    restOfString: n[2]
+function q(s) {
+  const i = /^\[([^\]]+)]:(.*)/, l = s.match(i);
+  return l ? {
+    content: l[1],
+    restOfString: l[2]
   } : null;
 }
-function v(s, o, n) {
+function x(s, i, l) {
   if (typeof s != "string")
     return s;
   const e = s.replace(/^\[|]$/g, "").replaceAll("_", " ");
-  return e.startsWith("&") ? j(o, s, ["trigger"].includes(n)) : e === "true" || e === "false" ? e === "true" : isNaN(Number(e)) ? e : e.includes(".") ? parseFloat(e) : parseInt(e, 10);
+  return e.startsWith("&") ? S(i, s, ["trigger"].includes(l)) : e === "true" || e === "false" ? e === "true" : isNaN(Number(e)) ? e : e.includes(".") ? parseFloat(e) : parseInt(e, 10);
 }
-function k(s, o = !1, n) {
+function N(s, i = !1, l) {
   const e = {};
-  return s.split(" ").forEach((h) => {
-    var A;
-    const p = $(h);
-    p && (h = p.restOfString, e.selector = {}, e.selector.value = p.content);
-    const y = h.split(":").filter((m) => !m.includes("@")), [g, b] = y;
-    if (!b && o) {
-      const m = h.split("-"), l = m[0], u = m[1];
-      if (!l || !u)
+  return s.split(" ").forEach((u) => {
+    var O;
+    const m = q(u);
+    m && (u = m.restOfString, e.selector = {}, e.selector.value = m.content);
+    const M = u.split(":").filter((b) => !b.includes("@")), [d, g] = M;
+    if (!g && i) {
+      const b = u.split("-"), E = b[0], A = b[1];
+      if (!E || !A)
         return;
-      e[l] = v(u, n, l);
+      e[E] = x(A, l, E);
       return;
     }
-    if (g === "tl" && b.startsWith("[")) {
+    if (d === "tl" && g.startsWith("[")) {
       e.tl = {
-        value: (A = $(b + ":")) == null ? void 0 : A.content
+        value: (O = q(g + ":")) == null ? void 0 : O.content
       };
       return;
     }
-    if (!b)
+    if (!g)
       return;
-    const O = b.split("|");
-    e[g] || (e[g] = {}), O.forEach((m) => {
-      if (!m)
+    const k = g.split("|");
+    e[d] || (e[d] = {}), k.forEach((b) => {
+      if (!b)
         return;
-      let [l, u] = m.split(/-(.+)/);
-      u = v(u, n, l);
-      const f = l.split(".");
-      let t = e[g];
-      f.forEach((r, i) => {
-        i === f.length - 1 ? t[r] = u : (t[r] || (t[r] = {}), t = t[r]);
+      let [E, A] = b.split(/-(.+)/);
+      A = x(A, l, E);
+      const T = E.split(".");
+      let j = e[d];
+      T.forEach((c, a) => {
+        a === T.length - 1 ? j[c] = A : (j[c] || (j[c] = {}), j = j[c]);
       });
     });
   }), e;
 }
-function w(s) {
-  const o = "(min-width: 1024px)", n = {}, e = [], d = [], h = /* @__PURE__ */ new Map(), p = (l) => (l.getAttribute(g()) || "").trim(), y = (l = document) => l.querySelectorAll(g(!0)), g = (l = !1) => `${l ? "[" : ""}${s.dataAttribute}${l ? "]" : ""}`;
-  function b(l) {
-    const u = /(?:@(\w+):)?tl(?:\/(\w+))?/, f = l.match(u);
+function F(s) {
+  var j;
+  if (!((j = s.gsap) != null && j.core))
+    throw new Error("GSAP not found");
+  const i = {
+    dataAttribute: "data-animate",
+    breakpoints: {
+      default: "(min-width: 1px)",
+      ...(s == null ? void 0 : s.breakpoints) || {}
+    }
+  }, l = i.dataAttribute, e = s.gsap.core, p = i.breakpoints.default, u = i.breakpoints, m = [], M = [], d = /* @__PURE__ */ new Map(), g = (c) => (c.getAttribute(O()) || "").trim(), k = (c = document) => c.querySelectorAll(O(!0)), O = (c = !1) => `${c ? "[" : ""}${l}${c ? "]" : ""}`;
+  function b(c) {
+    const a = /(?:@(\w+):)?tl(?:\/(\w+))?/, f = c.match(a);
     if (f) {
-      const t = f[1], i = { id: f[2] ?? "", matchMedia: o };
+      const t = f[1], o = { id: f[2] ?? "", matchMedia: p };
       if (t) {
-        if (!(n != null && n[t]))
+        if (!(u != null && u[t]))
           return null;
-        i.matchMedia = n[t];
+        o.matchMedia = u[t];
       }
-      return i;
+      return o;
     } else
       return null;
   }
-  function O(l) {
-    const u = {};
-    return l.split(" ").forEach((t) => {
+  function E(c) {
+    const a = {};
+    return c.split(" ").forEach((t) => {
       const r = t.match(/@(\w+):/);
       if (!r) {
-        u[o] || (u[o] = []), u[o].push(t);
+        a[p] || (a[p] = []), a[p].push(t);
         return;
       }
-      const i = r[1];
-      n != null && n[i] && (u[n[i]] || (u[n[i]] = []), u[n[i]].push(t.replace(r[0], "")));
-    }), u;
+      const o = r[1];
+      u != null && u[o] && (a[u[o]] || (a[u[o]] = []), a[u[o]].push(t.replace(r[0], "")));
+    }), a;
   }
   function A() {
-    const l = [], u = y(), f = (t) => t === "tl" || t.includes("tl/") || t.endsWith(":tl");
-    u.forEach((t) => {
-      const r = p(t), i = r.split(" ");
-      if (i.some((c) => f(c))) {
-        const c = b(r), a = [];
+    const c = [], a = k(), f = (t) => t === "tl" || t.includes("tl/") || t.endsWith(":tl");
+    a.forEach((t) => {
+      const r = g(t), o = r.split(" ");
+      if (o.some((n) => f(n))) {
+        const n = b(r), h = [];
         [
-          ...y(t),
-          ...c != null && c.id ? document.querySelectorAll(
-            `[${s.dataAttribute}*="tl:${c.id}"]`
+          ...k(t),
+          ...n != null && n.id ? document.querySelectorAll(
+            `[${l}*="tl:${n.id}"]`
           ) : []
-        ].forEach((E) => {
-          a.push(E);
+        ].forEach((y) => {
+          h.push(y);
         });
-        const M = k(
-          i.filter((E) => !f(E)).join(" "),
+        const w = N(
+          o.filter((y) => !f(y)).join(" "),
           !0,
           t
         );
-        l.push(t), d.push({
-          id: (c == null ? void 0 : c.id) || Math.random().toString(36).substring(2, 15),
-          data: M,
-          matchMedia: (c == null ? void 0 : c.matchMedia) || o,
-          elements: a
+        c.push(t), M.push({
+          id: (n == null ? void 0 : n.id) || Math.random().toString(36).substring(2, 15),
+          data: w,
+          matchMedia: (n == null ? void 0 : n.matchMedia) || p,
+          elements: h
         });
         return;
       }
-    }), u.forEach((t) => {
-      var i;
-      if (l.includes(t))
+    }), a.forEach((t) => {
+      var o;
+      if (c.includes(t))
         return;
-      const r = (i = d.find(
-        (c) => c.elements.some((a) => a === t) && c.matchMedia
-      )) == null ? void 0 : i.matchMedia;
-      e.push(
-        ...Object.entries(O(p(t))).map(
-          ([c, a]) => ({
-            matchMedia: c ?? r,
+      const r = (o = M.find(
+        (n) => n.elements.some((h) => h === t) && n.matchMedia
+      )) == null ? void 0 : o.matchMedia;
+      m.push(
+        ...Object.entries(E(g(t))).map(
+          ([n, h]) => ({
+            matchMedia: n ?? r,
             element: t,
-            data: k(a.join(" "), !1, t)
+            data: N(h.join(" "), !1, t)
           })
         )
       );
-    }), e.forEach((t) => {
-      h.has(t.element) || h.set(t.element, {});
+    }), m.forEach((t) => {
+      d.has(t.element) || d.set(t.element, {});
       const r = {
         [t.matchMedia]: t.data
       };
-      h.set(t.element, {
-        ...h.get(t.element),
+      d.set(t.element, {
+        ...d.get(t.element),
         ...r
       });
     });
   }
-  function m() {
-    const l = gsap.matchMedia(), u = (f, t, r) => {
-      var c;
-      const i = t.tl ? (c = Object.values(t.tl)) == null ? void 0 : c[0] : void 0;
+  function T() {
+    const c = e.matchMedia(), a = (f, t, r) => {
+      var n;
+      const o = t.tl ? (n = Object.values(t.tl)) == null ? void 0 : n[0] : void 0;
       if (t.to && t.from) {
         r ? r.fromTo(
-          j(f, t),
+          S(f, t),
           t.from,
           t.to,
-          i
-        ) : gsap.fromTo(j(f, t), t.from, t.to);
+          o
+        ) : e.fromTo(S(f, t), t.from, t.to);
         return;
       }
       if (t.to || t.from) {
-        const a = t.to ? "to" : "from";
-        r ? r[a](
-          j(f, t),
-          t[a],
-          i
-        ) : gsap[a](j(f, t), t[a]);
+        const h = t.to ? "to" : "from";
+        r ? r[h](
+          S(f, t),
+          t[h],
+          o
+        ) : e[h](S(f, t), t[h]);
       }
     };
-    l.add(
+    c.add(
       Object.fromEntries(
         Object.values({
-          [o]: o,
-          ...n || {}
+          [p]: p,
+          ...u || {}
         }).map((f) => [f, f])
       ),
       (f) => {
         const t = [];
-        d.forEach((r) => {
-          const i = gsap.timeline(r.data || {});
+        M.forEach((r) => {
+          const o = e.timeline(r.data || {});
           t.push({
             elements: r.elements,
-            timeline: i
+            timeline: o
           });
-        }), h.forEach((r, i) => {
-          var M;
-          let c = {};
-          Object.entries(r).forEach(([E, q]) => {
-            var W;
-            (W = f.conditions) != null && W[E] && (c = T(c, q));
+        }), d.forEach((r, o) => {
+          var w;
+          let n = {};
+          Object.entries(r).forEach(([y, V]) => {
+            var v;
+            (v = f.conditions) != null && v[y] && (n = $(n, V));
           });
-          const a = (M = t.find(
-            ({ elements: E }) => E.includes(i)
-          )) == null ? void 0 : M.timeline;
-          u(i, c, a);
+          const h = (w = t.find(
+            ({ elements: y }) => y.includes(o)
+          )) == null ? void 0 : w.timeline;
+          a(o, n, h);
         });
       }
     );
   }
-  A(), m();
+  A(), T();
 }
 export {
-  w as glaze
+  F as glaze
 };

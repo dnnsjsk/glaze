@@ -22,9 +22,10 @@ function glaze(config: GlazeConfig) {
     },
   };
 
+  const dataAttribute = state.dataAttribute;
   const gsap = config.gsap.core;
   const initialBp = state.breakpoints.default;
-  const breakpoints: { [p: string]: string } | undefined = state.breakpoints;
+  const matchMedias: { [p: string]: string } | undefined = state.breakpoints;
 
   const elements: GlazeAnimationCollection[] = [];
   const timelines: GlazeTimeline[] = [];
@@ -42,9 +43,7 @@ function glaze(config: GlazeConfig) {
     element.querySelectorAll(getAttributeString(true));
 
   const getAttributeString = (withBrackets = false) =>
-    `${withBrackets ? "[" : ""}${state.dataAttribute}${
-      withBrackets ? "]" : ""
-    }`;
+    `${withBrackets ? "[" : ""}${dataAttribute}${withBrackets ? "]" : ""}`;
 
   function parseTimeline(input: string) {
     const regex = /(?:@(\w+):)?tl(?:\/(\w+))?/;
@@ -56,8 +55,8 @@ function glaze(config: GlazeConfig) {
       const result = { id, matchMedia: initialBp };
 
       if (matchMedia) {
-        if (!breakpoints?.[matchMedia]) return null;
-        result.matchMedia = breakpoints[matchMedia];
+        if (!matchMedias?.[matchMedia]) return null;
+        result.matchMedia = matchMedias[matchMedia];
       }
 
       return result;
@@ -81,11 +80,11 @@ function glaze(config: GlazeConfig) {
       }
 
       const matchMedia = match[1];
-      if (!breakpoints?.[matchMedia]) return;
-      if (!results[breakpoints[matchMedia]])
-        results[breakpoints[matchMedia]] = [];
+      if (!matchMedias?.[matchMedia]) return;
+      if (!results[matchMedias[matchMedia]])
+        results[matchMedias[matchMedia]] = [];
 
-      results[breakpoints[matchMedia]].push(segment.replace(match[0], ""));
+      results[matchMedias[matchMedia]].push(segment.replace(match[0], ""));
     });
     return results;
   }
@@ -108,7 +107,7 @@ function glaze(config: GlazeConfig) {
           ...getElements(element),
           ...(timelineData?.id
             ? document.querySelectorAll(
-                `[${state.dataAttribute}*="tl:${timelineData.id}"]`,
+                `[${dataAttribute}*="tl:${timelineData.id}"]`,
               )
             : []),
         ].forEach((el) => {
@@ -165,7 +164,7 @@ function glaze(config: GlazeConfig) {
       });
     });
 
-    console.log("matchMedias:", breakpoints);
+    console.log("matchMedias:", matchMedias);
     console.log("timelines:", timelines);
     console.log("elements:", elements);
     console.log("data", data);
@@ -212,7 +211,7 @@ function glaze(config: GlazeConfig) {
       Object.fromEntries(
         Object.values({
           ...{ [initialBp]: initialBp },
-          ...(breakpoints || {}),
+          ...(matchMedias || {}),
         }).map((key) => [key, key]),
       ),
       (context) => {
