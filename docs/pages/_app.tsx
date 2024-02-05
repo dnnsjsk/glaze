@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-export default function ({ Component, pageProps }) {
+const App = ({ Component, pageProps }) => {
   const router = useRouter();
 
   useEffect(() => {
@@ -34,4 +34,6 @@ export default function ({ Component, pageProps }) {
       <Component {...pageProps} />
     </main>
   );
-};
+}
+
+export default App;
