@@ -34,6 +34,6 @@ const App = ({ Component, pageProps }) => {
       <Component {...pageProps} />
     </main>
   );
-}
+};
 
 export default App;

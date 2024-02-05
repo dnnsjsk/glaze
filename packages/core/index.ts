@@ -1,10 +1,10 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Glaze } from "./src";
+import { glaze } from "./src";
 
 gsap.registerPlugin(ScrollTrigger);
 
-new Glaze({
+glaze({
   gsap: { core: gsap },
   breakpoints: {
     sm: "(min-width: 640px)",

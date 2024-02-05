@@ -1,5 +1,5 @@
 import { defineConfig, ViteDevServer } from "vite";
-import dts from 'vite-plugin-dts';
+import dts from "vite-plugin-dts";
 
 const removeConsolePlugin = () => {
   return {
@@ -37,7 +37,11 @@ export default defineConfig({
     },
     minify: "esbuild",
   },
-  plugins: [removeConsolePlugin(), forceFullReloadPlugin(), dts({
-    include: ['./src/index.ts']
-  })],
+  plugins: [
+    removeConsolePlugin(),
+    forceFullReloadPlugin(),
+    dts({
+      include: ["./src/index.ts"],
+    }),
+  ],
 });

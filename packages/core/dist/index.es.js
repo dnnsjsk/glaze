@@ -1,245 +1,211 @@
-var A = Object.defineProperty;
-var y = (d, e, i) => e in d ? A(d, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : d[e] = i;
-var l = (d, e, i) => (y(d, typeof e != "symbol" ? e + "" : e, i), i);
-const n = class n {
-  static isObject(e) {
-    return e && typeof e == "object" && !Array.isArray(e) && !(e instanceof HTMLElement);
+function j(s, o, n = !1) {
+  var d;
+  const e = typeof o != "string" ? (d = o == null ? void 0 : o.selector) == null ? void 0 : d.value : "";
+  if (e) {
+    if (e.startsWith("&")) {
+      const p = e == null ? void 0 : e.replace("&", ":scope");
+      return n ? s.querySelector(p) : s.querySelectorAll(p);
+    }
+    return e;
   }
-  static mergeDeep(e, ...i) {
-    if (!i.length)
-      return e;
-    const r = i.shift();
-    if (this.isObject(e) && this.isObject(r))
-      for (const t in r)
-        this.isObject(r[t]) ? (e[t] || Object.assign(e, { [t]: {} }), this.mergeDeep(e[t], r[t])) : Object.assign(e, { [t]: r[t] });
-    return i.length ? this.mergeDeep(e, ...i) : e;
-  }
-  static generateUniqueId() {
-    return Math.random().toString(36).substring(2, 15);
-  }
-  static getSelectorFromBracket(e) {
-    const i = /^\[([^\]]+)]:(.*)/, r = e.match(i);
-    return r ? {
-      content: r[1],
-      restOfString: r[2]
-    } : null;
-  }
-  static castValue(e, i, r) {
-    if (typeof e != "string")
-      return e;
-    const t = e.replace(/^\[|]$/g, "").replaceAll("_", " ");
-    return t.startsWith("&") ? this.getSelectorOrElement(
-      i,
-      e,
-      ["trigger"].includes(r)
-    ) : t === "true" || t === "false" ? t === "true" : isNaN(Number(t)) ? t : t.includes(".") ? parseFloat(t) : parseInt(t, 10);
-  }
-  static parseTimeline(e) {
-    var t;
-    const i = /(?:@(\w+):)?tl(?:\/(\w+))?/, r = e.match(i);
-    if (r) {
-      const c = r[1], s = { id: r[2] ?? "", matchMedia: this.bp };
-      if (c) {
-        if (!((t = this.matchMedias) != null && t[c]))
+  return s;
+}
+function S(s) {
+  return s && typeof s == "object" && !Array.isArray(s) && !(s instanceof HTMLElement);
+}
+function T(s, ...o) {
+  if (!o.length)
+    return s;
+  const n = o.shift();
+  if (S(s) && S(n))
+    for (const e in n)
+      S(n[e]) ? (s[e] || Object.assign(s, { [e]: {} }), T(s[e], n[e])) : Object.assign(s, { [e]: n[e] });
+  return o.length ? T(s, ...o) : s;
+}
+function $(s) {
+  const o = /^\[([^\]]+)]:(.*)/, n = s.match(o);
+  return n ? {
+    content: n[1],
+    restOfString: n[2]
+  } : null;
+}
+function v(s, o, n) {
+  if (typeof s != "string")
+    return s;
+  const e = s.replace(/^\[|]$/g, "").replaceAll("_", " ");
+  return e.startsWith("&") ? j(o, s, ["trigger"].includes(n)) : e === "true" || e === "false" ? e === "true" : isNaN(Number(e)) ? e : e.includes(".") ? parseFloat(e) : parseInt(e, 10);
+}
+function k(s, o = !1, n) {
+  const e = {};
+  return s.split(" ").forEach((h) => {
+    var A;
+    const p = $(h);
+    p && (h = p.restOfString, e.selector = {}, e.selector.value = p.content);
+    const y = h.split(":").filter((m) => !m.includes("@")), [g, b] = y;
+    if (!b && o) {
+      const m = h.split("-"), l = m[0], u = m[1];
+      if (!l || !u)
+        return;
+      e[l] = v(u, n, l);
+      return;
+    }
+    if (g === "tl" && b.startsWith("[")) {
+      e.tl = {
+        value: (A = $(b + ":")) == null ? void 0 : A.content
+      };
+      return;
+    }
+    if (!b)
+      return;
+    const O = b.split("|");
+    e[g] || (e[g] = {}), O.forEach((m) => {
+      if (!m)
+        return;
+      let [l, u] = m.split(/-(.+)/);
+      u = v(u, n, l);
+      const f = l.split(".");
+      let t = e[g];
+      f.forEach((r, i) => {
+        i === f.length - 1 ? t[r] = u : (t[r] || (t[r] = {}), t = t[r]);
+      });
+    });
+  }), e;
+}
+function w(s) {
+  const o = "(min-width: 1024px)", n = {}, e = [], d = [], h = /* @__PURE__ */ new Map(), p = (l) => (l.getAttribute(g()) || "").trim(), y = (l = document) => l.querySelectorAll(g(!0)), g = (l = !1) => `${l ? "[" : ""}${s.dataAttribute}${l ? "]" : ""}`;
+  function b(l) {
+    const u = /(?:@(\w+):)?tl(?:\/(\w+))?/, f = l.match(u);
+    if (f) {
+      const t = f[1], i = { id: f[2] ?? "", matchMedia: o };
+      if (t) {
+        if (!(n != null && n[t]))
           return null;
-        s.matchMedia = this.matchMedias[c];
+        i.matchMedia = n[t];
       }
-      return s;
+      return i;
     } else
       return null;
   }
-  static parseMediaQueries(e) {
-    const i = {};
-    return e.split(" ").forEach((t) => {
-      var s;
-      const c = t.match(/@(\w+):/);
-      if (!c) {
-        i[this.bp] || (i[this.bp] = []), i[this.bp].push(t);
+  function O(l) {
+    const u = {};
+    return l.split(" ").forEach((t) => {
+      const r = t.match(/@(\w+):/);
+      if (!r) {
+        u[o] || (u[o] = []), u[o].push(t);
         return;
       }
-      const o = c[1];
-      (s = this.matchMedias) != null && s[o] && (i[this.matchMedias[o]] || (i[this.matchMedias[o]] = []), i[this.matchMedias[o]].push(t.replace(c[0], "")));
-    }), i;
+      const i = r[1];
+      n != null && n[i] && (u[n[i]] || (u[n[i]] = []), u[n[i]].push(t.replace(r[0], "")));
+    }), u;
   }
-  static parseToObject(e, i = !1, r) {
-    const t = {};
-    return e.split(" ").forEach((o) => {
-      var g;
-      const s = this.getSelectorFromBracket(o);
-      s && (o = s.restOfString, t.selector = {}, t.selector.value = s.content);
-      const a = o.split(":").filter((f) => !f.includes("@")), [u, h] = a;
-      if (!h && i) {
-        const f = o.split("-"), m = f[0], p = f[1];
-        if (!m || !p)
-          return;
-        t[m] = this.castValue(p, r, m);
-        return;
-      }
-      if (u === "tl" && h.startsWith("[")) {
-        t.tl = {
-          value: (g = this.getSelectorFromBracket(h + ":")) == null ? void 0 : g.content
-        };
-        return;
-      }
-      if (!h)
-        return;
-      const O = h.split("|");
-      t[u] || (t[u] = {}), O.forEach((f) => {
-        if (!f)
-          return;
-        let [m, p] = f.split(/-(.+)/);
-        p = this.castValue(p, r, m);
-        const E = m.split(".");
-        let b = t[u];
-        E.forEach((M, j) => {
-          j === E.length - 1 ? b[M] = p : (b[M] || (b[M] = {}), b = b[M]);
-        });
-      });
-    }), t;
-  }
-  static collect() {
-    const e = [], i = this.getElements(), r = (t) => t === "tl" || t.includes("tl/") || t.endsWith(":tl");
-    i.forEach((t) => {
-      const c = this.getAttribute(t), o = c.split(" ");
-      if (o.some((s) => r(s))) {
-        const s = this.parseTimeline(c), a = [];
+  function A() {
+    const l = [], u = y(), f = (t) => t === "tl" || t.includes("tl/") || t.endsWith(":tl");
+    u.forEach((t) => {
+      const r = p(t), i = r.split(" ");
+      if (i.some((c) => f(c))) {
+        const c = b(r), a = [];
         [
-          ...this.getElements(t),
-          ...s != null && s.id ? document.querySelectorAll(
-            `[${this.config.dataAttribute}*="tl:${s.id}"]`
+          ...y(t),
+          ...c != null && c.id ? document.querySelectorAll(
+            `[${s.dataAttribute}*="tl:${c.id}"]`
           ) : []
-        ].forEach((h) => {
-          a.push(h);
+        ].forEach((E) => {
+          a.push(E);
         });
-        const u = this.parseToObject(
-          o.filter((h) => !r(h)).join(" "),
+        const M = k(
+          i.filter((E) => !f(E)).join(" "),
           !0,
           t
         );
-        e.push(t), this.timelines.push({
-          id: (s == null ? void 0 : s.id) || this.generateUniqueId(),
-          data: u,
-          matchMedia: (s == null ? void 0 : s.matchMedia) || this.bp,
+        l.push(t), d.push({
+          id: (c == null ? void 0 : c.id) || Math.random().toString(36).substring(2, 15),
+          data: M,
+          matchMedia: (c == null ? void 0 : c.matchMedia) || o,
           elements: a
         });
         return;
       }
-    }), i.forEach((t) => {
-      var o;
-      if (e.includes(t))
+    }), u.forEach((t) => {
+      var i;
+      if (l.includes(t))
         return;
-      const c = (o = this.timelines.find(
-        (s) => s.elements.some((a) => a === t) && s.matchMedia
-      )) == null ? void 0 : o.matchMedia;
-      this.elements.push(
-        ...Object.entries(
-          this.parseMediaQueries(this.getAttribute(t))
-        ).map(([s, a]) => ({
-          matchMedia: s ?? c,
-          element: t,
-          data: this.parseToObject(a.join(" "), !1, t)
-        }))
+      const r = (i = d.find(
+        (c) => c.elements.some((a) => a === t) && c.matchMedia
+      )) == null ? void 0 : i.matchMedia;
+      e.push(
+        ...Object.entries(O(p(t))).map(
+          ([c, a]) => ({
+            matchMedia: c ?? r,
+            element: t,
+            data: k(a.join(" "), !1, t)
+          })
+        )
       );
-    }), this.elements.forEach((t) => {
-      this.data.has(t.element) || this.data.set(t.element, {});
-      const c = {
+    }), e.forEach((t) => {
+      h.has(t.element) || h.set(t.element, {});
+      const r = {
         [t.matchMedia]: t.data
       };
-      this.data.set(t.element, {
-        ...this.data.get(t.element),
-        ...c
+      h.set(t.element, {
+        ...h.get(t.element),
+        ...r
       });
     });
   }
-  static init() {
-    const e = this.gsap.matchMedia(), i = (r, t, c) => {
-      var s;
-      const o = t.tl ? (s = Object.values(t.tl)) == null ? void 0 : s[0] : void 0;
+  function m() {
+    const l = gsap.matchMedia(), u = (f, t, r) => {
+      var c;
+      const i = t.tl ? (c = Object.values(t.tl)) == null ? void 0 : c[0] : void 0;
       if (t.to && t.from) {
-        c ? c.fromTo(
-          this.getSelectorOrElement(r, t),
+        r ? r.fromTo(
+          j(f, t),
           t.from,
           t.to,
-          o
-        ) : this.gsap.fromTo(
-          this.getSelectorOrElement(r, t),
-          t.from,
-          t.to
-        );
+          i
+        ) : gsap.fromTo(j(f, t), t.from, t.to);
         return;
       }
       if (t.to || t.from) {
         const a = t.to ? "to" : "from";
-        c ? c[a](
-          this.getSelectorOrElement(r, t),
+        r ? r[a](
+          j(f, t),
           t[a],
-          o
-        ) : this.gsap[a](this.getSelectorOrElement(r, t), t[a]);
+          i
+        ) : gsap[a](j(f, t), t[a]);
       }
     };
-    e.add(
+    l.add(
       Object.fromEntries(
         Object.values({
-          [this.bp]: this.bp,
-          ...this.matchMedias || {}
-        }).map((r) => [r, r])
+          [o]: o,
+          ...n || {}
+        }).map((f) => [f, f])
       ),
-      (r) => {
+      (f) => {
         const t = [];
-        this.timelines.forEach((c) => {
-          const o = this.gsap.timeline(c.data || {});
+        d.forEach((r) => {
+          const i = gsap.timeline(r.data || {});
           t.push({
-            elements: c.elements,
-            timeline: o
+            elements: r.elements,
+            timeline: i
           });
-        }), this.data.forEach((c, o) => {
-          var u;
-          let s = {};
-          Object.entries(c).forEach(([h, O]) => {
-            var g;
-            (g = r.conditions) != null && g[h] && (s = this.mergeDeep(s, O));
+        }), h.forEach((r, i) => {
+          var M;
+          let c = {};
+          Object.entries(r).forEach(([E, q]) => {
+            var W;
+            (W = f.conditions) != null && W[E] && (c = T(c, q));
           });
-          const a = (u = t.find(
-            ({ elements: h }) => h.includes(o)
-          )) == null ? void 0 : u.timeline;
-          i(o, s, a);
+          const a = (M = t.find(
+            ({ elements: E }) => E.includes(i)
+          )) == null ? void 0 : M.timeline;
+          u(i, c, a);
         });
       }
     );
   }
-  constructor(e) {
-    if (!e.gsap.core) {
-      console.error("Glaze: GSAP is not defined");
-      return;
-    }
-    return n.config = {
-      ...n.config,
-      ...e
-    }, n.matchMedias = e.breakpoints, n.gsap = e.gsap.core, n.collect(), n.init(), {
-      gsap: n.gsap,
-      config: n.config,
-      matchMedias: n.matchMedias,
-      elements: n.elements,
-      timelines: n.timelines,
-      data: n.data
-    };
-  }
-};
-l(n, "bp", "(min-width: 1px)"), l(n, "gsap"), l(n, "config", {
-  dataAttribute: "data-animate"
-}), l(n, "matchMedias", {}), l(n, "elements", []), l(n, "timelines", []), l(n, "data", /* @__PURE__ */ new Map()), l(n, "getAttributeString", (e = !1) => `${e ? "[" : ""}${n.config.dataAttribute}${e ? "]" : ""}`), l(n, "getAttribute", (e) => (e.getAttribute(n.getAttributeString()) || "").trim()), l(n, "getElements", (e = document) => e.querySelectorAll(n.getAttributeString(!0))), l(n, "getSelectorOrElement", (e, i, r = !1) => {
-  var c;
-  const t = typeof i != "string" ? (c = i == null ? void 0 : i.selector) == null ? void 0 : c.value : "";
-  if (t) {
-    if (t.startsWith("&")) {
-      const s = t == null ? void 0 : t.replace("&", ":scope");
-      return r ? e.querySelector(s) : e.querySelectorAll(s);
-    }
-    return t;
-  }
-  return e;
-});
-let S = n;
+  A(), m();
+}
 export {
-  S as Glaze
+  w as glaze
 };
