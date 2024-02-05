@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Glaze docs",
   "scripts": {
-    "dev": "next dev",
+    "predev": "rm -rf .next || true",
+    "dev": "npm run predev && next dev",
     "build": "next build",
     "start": "next start"
   },

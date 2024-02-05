@@ -2,7 +2,8 @@
   "name": "glaze-monorepo",
   "private": true,
   "scripts": {
-    "build": "npx turbo run build"
+    "prebuild": "rm -rf docs/.next || true",
+    "build": "npm run prebuild && npx turbo run build"
   },
   "devDependencies": {
     "turbo": "latest"
