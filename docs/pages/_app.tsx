@@ -1,5 +1,5 @@
 import "../src/style.css";
-import { Glaze } from "glaze";
+import { glaze } from "glaze";
 import { gsap } from "gsap";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
@@ -12,7 +12,7 @@ const App = ({ Component, pageProps }) => {
     gsap.registerPlugin(ScrollTrigger);
 
     const init = () => {
-      new Glaze({
+      glaze({
         gsap: { core: gsap },
         breakpoints: {
           sm: "(min-width: 640px)",

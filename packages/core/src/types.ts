@@ -6,16 +6,17 @@ type GlazeAnimationCollection = {
 
 type GlazeAnimationObject = {
   [key: string]: {
-    // eslint-disable-next-line
     [key: string]: any;
   };
 };
 
 type GlazeConfig = {
   breakpoints?: {
-    [key: string]: string;
+    default?: string;
+    [key: string]: string | undefined;
   };
   dataAttribute?: string;
+  element?: Document | Element;
   gsap: { core: typeof import("gsap").gsap };
 };
 
@@ -30,7 +31,6 @@ type GlazeTimeline = {
   matchMedia: string;
 };
 
-// eslint-disable-next-line
 type PlainObject = { [key: string]: any };
 
 export type {

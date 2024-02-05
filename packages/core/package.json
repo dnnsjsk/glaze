@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build && node scripts/postbuild.js"
   },
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -11,6 +11,7 @@
     "gsap": "^3.12.5",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
+    "terser": "^5.27.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
     "vite-plugin-dts": "^3.7.2"

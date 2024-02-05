@@ -1,15 +1,6 @@
 import { defineConfig, ViteDevServer } from "vite";
 import dts from "vite-plugin-dts";
 
-const removeConsolePlugin = () => {
-  return {
-    name: "remove-console", // name of the plugin
-    renderChunk(code: string) {
-      return code.replace(/console\.log\(.*\);?/g, "");
-    },
-  };
-};
-
 const forceFullReloadPlugin = () => {
   return {
     name: "force-full-reload",
@@ -38,7 +29,6 @@ export default defineConfig({
     minify: "esbuild",
   },
   plugins: [
-    removeConsolePlugin(),
     forceFullReloadPlugin(),
     dts({
       include: ["./src/index.ts"],
