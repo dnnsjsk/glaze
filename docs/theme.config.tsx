@@ -40,7 +40,7 @@ const config: DocsThemeConfig = {
           content={title ? title + " – Glaze" : "Glaze"}
         />
         <meta name="og:image" content={socialCard} />
-        <meta name="apple-mobile-web-app-title" content="Nextra" />
+        <meta name="apple-mobile-web-app-title" content="Glaze" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.png" type="image/png" />
       </>
