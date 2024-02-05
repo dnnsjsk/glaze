@@ -1,11 +1,8 @@
 import "../src/style.css";
-import { Inter } from "next/font/google";
 import { Glaze } from "../../dist/glaze.es";
 import { gsap } from "gsap";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-
-const inter = Inter({ subsets: ["latin"], weight: "variable" });
 
 const App = ({ Component, pageProps }) => {
   const router = useRouter();
@@ -33,7 +30,7 @@ const App = ({ Component, pageProps }) => {
   }, []);
 
   return (
-    <main className={inter.className}>
+    <main>
       <Component {...pageProps} />
     </main>
   );

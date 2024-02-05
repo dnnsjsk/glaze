@@ -9,11 +9,19 @@
   --shiki-token-function: #ffb454 !important;
   --shiki-token-string-expression: #aad94c !important;
   --shiki-token-keyword: #bfbdb6b3 !important;
+  font-family: Inter, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+@supports (font-variation-settings: normal) {
+  :root {
+    font-family: InterVariable, sans-serif;
+  }
 }
 
 html {
-  font-feature-settings: "calt", "cv02", "cv03", "cv04", "cv11";
-  font-variation-settings: normal;
+  font-feature-settings: "calt", "cv02", "cv03", "cv04", "cv11" !important;
+  font-variation-settings: normal !important;
 }
 
 body,
