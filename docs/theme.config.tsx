@@ -14,7 +14,7 @@ const config: DocsThemeConfig = {
   docsRepositoryBase: "https://github.com/shuding/nextra-docs-template",
   head: function useHead() {
     const { title } = useConfig();
-    const socialCard = "https://glaze.dev/og.jpeg";
+    const socialCard = "https://glaze.dev/og.png";
     return (
       <>
         <link rel="preconnect" href="https://rsms.me/" />
