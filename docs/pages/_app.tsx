@@ -1,5 +1,5 @@
 import "../src/style.css";
-import { Glaze } from "../../dist/glaze.es";
+import { Glaze } from "glaze";
 import { gsap } from "gsap";
 import { useEffect } from "react";
 import { useRouter } from "next/router";

@@ -1,20 +1,14 @@
 {
-  "name": "glaze",
+  "name": "glaze-monorepo",
   "private": true,
-  "version": "0.1.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build"
+    "build": "npx turbo run build"
   },
   "devDependencies": {
-    "gsap": "^3.12.5",
-    "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.11",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.12"
+    "turbo": "latest"
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "packageManager": "pnpm@8.15.1"
 }
