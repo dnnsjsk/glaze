@@ -1,4 +1,4 @@
-![glaze image](https://raw.githubusercontent.com/dnnsjsk/glaze/main/docs/public/og.png)
+![glaze image](https://raw.githubusercontent.com/dnnsjsk/glaze/main/image.png)
 
 Glaze is an animation framework that combines the power of
 [GSAP](https://greensock.com/gsap/) and utility-based document authoring à la
