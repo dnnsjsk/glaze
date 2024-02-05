@@ -1,0 +1,30 @@
+import Example from "../components/Example";
+
+# ScrollTrigger
+
+There is no special syntax needed to use
+[ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) with Glaze.
+Since it is defined inside the `scrollTrigger` property of the animation object,
+dot notation can be used to adjust its settings.
+
+```html copy
+<div id="scroll" class="flex h-[50vh] items-center">
+  <div
+    class="h-20 w-20 rounded-xl bg-amber-500 sm:invisible"
+    data-animate="from:autoAlpha-0|rotate-180|y-50|scrollTrigger.trigger-[#start]|scrollTrigger.scrub-true|scrollTrigger.start-[top_center]|scrollTrigger.end-[-=200]"
+  ></div>
+</div>
+```
+
+<Example>
+  {`
+<div id="scroll" class="flex h-[50vh] items-center">
+  <div
+    class="h-20 w-20 rounded-xl bg-amber-500 sm:invisible"
+    data-animate="from:autoAlpha-0|rotate-180|y-50|scrollTrigger.trigger-[#start]|boxShadow-[0_0_50px_20px_red]|scrollTrigger.scrub-true|scrollTrigger.start-[top_center]|scrollTrigger.end-[-=200]"
+  ></div>
+</div>
+`}
+</Example>
+
+<div className="h-screen" />

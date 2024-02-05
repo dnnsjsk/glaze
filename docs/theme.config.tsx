@@ -33,11 +33,11 @@ const config: DocsThemeConfig = {
         <meta httpEquiv="Content-Language" content="en" />
         <meta
           name="description"
-          content="The utility-based animation library for the web."
+          content="The utility-based animation framework for the web."
         />
         <meta
           name="og:description"
-          content="The utility-based animation library for the web."
+          content="The utility-based animation framework for the web."
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={socialCard} />

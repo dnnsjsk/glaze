@@ -79,7 +79,8 @@ converted to their appropriate type (`string`, `number`, or `boolean`).
 
 ### Chaining properties
 
-To combine multiple properties in a single animation, separate them with a pipe (`|`) character.
+To combine multiple properties in a single animation, separate them with a pipe
+(`|`) character.
 
 ```html copy
 <div data-animate="to:opacity-1|yPercent-10"></div>
@@ -99,4 +100,12 @@ For negative values, enclose the value in brackets. (`[]`)
 
 ```html copy
 <div data-animate="to:xPercent-[-50]"></div>
+```
+
+### Spaces
+
+For values with spaces, use an underscore (`_`) character.
+
+```html copy
+<div data-animate="to:boxShadow-[0_0_50px_20px_red]"></div>
 ```

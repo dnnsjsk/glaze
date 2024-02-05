@@ -2,5 +2,6 @@
   "index": "Introduction",
   "syntax": "Syntax",
   "breakpoints": "Breakpoints",
-  "timelines": "Timelines"
+  "timelines": "Timelines",
+  "scrolltrigger": "ScrollTrigger"
 }

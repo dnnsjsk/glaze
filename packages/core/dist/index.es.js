@@ -1,6 +1,6 @@
-var y = Object.defineProperty;
-var A = (m, t, i) => t in m ? y(m, t, { enumerable: !0, configurable: !0, writable: !0, value: i }) : m[t] = i;
-var l = (m, t, i) => (A(m, typeof t != "symbol" ? t + "" : t, i), i);
+var A = Object.defineProperty;
+var y = (m, t, i) => t in m ? A(m, t, { enumerable: !0, configurable: !0, writable: !0, value: i }) : m[t] = i;
+var l = (m, t, i) => (y(m, typeof t != "symbol" ? t + "" : t, i), i);
 const n = class n {
   static isObject(t) {
     return t && typeof t == "object" && !Array.isArray(t);
@@ -34,7 +34,7 @@ const n = class n {
   static castValue(t) {
     if (typeof t != "string")
       return t;
-    const i = t.replace(/^\[|]$/g, "");
+    const i = t.replace(/^\[|]$/g, "").replaceAll("_", " ");
     return i === "true" || i === "false" ? i === "true" : isNaN(Number(i)) ? i : i.includes(".") ? parseFloat(i) : parseInt(i, 10);
   }
   static parseTimeline(t) {

@@ -123,7 +123,7 @@ class Glaze {
   static castValue(value: string | null): string | number | boolean | null {
     if (typeof value !== "string") return value;
 
-    const cleanedValue = value.replace(/^\[|]$/g, "");
+    const cleanedValue = value.replace(/^\[|]$/g, "").replaceAll('_', ' ');
 
     if (cleanedValue === "true" || cleanedValue === "false") {
       return cleanedValue === "true";
