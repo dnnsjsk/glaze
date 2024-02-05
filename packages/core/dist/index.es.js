@@ -3,8 +3,8 @@ function S(s, i, l = !1) {
   const e = typeof i != "string" ? (p = i == null ? void 0 : i.selector) == null ? void 0 : p.value : "";
   if (e) {
     if (e.startsWith("&")) {
-      const m = e == null ? void 0 : e.replace("&", ":scope");
-      return l ? s.querySelector(m) : s.querySelectorAll(m);
+      const d = e == null ? void 0 : e.replace("&", ":scope");
+      return l ? s.querySelector(d) : s.querySelectorAll(d);
     }
     return e;
   }
@@ -39,9 +39,9 @@ function N(s, i = !1, l) {
   const e = {};
   return s.split(" ").forEach((u) => {
     var O;
-    const m = q(u);
-    m && (u = m.restOfString, e.selector = {}, e.selector.value = m.content);
-    const M = u.split(":").filter((b) => !b.includes("@")), [d, g] = M;
+    const d = q(u);
+    d && (u = d.restOfString, e.selector = {}, e.selector.value = d.content);
+    const M = u.split(":").filter((b) => !b.includes("@")), [m, g] = M;
     if (!g && i) {
       const b = u.split("-"), E = b[0], A = b[1];
       if (!E || !A)
@@ -49,7 +49,7 @@ function N(s, i = !1, l) {
       e[E] = x(A, l, E);
       return;
     }
-    if (d === "tl" && g.startsWith("[")) {
+    if (m === "tl" && g.startsWith("[")) {
       e.tl = {
         value: (O = q(g + ":")) == null ? void 0 : O.content
       };
@@ -58,13 +58,13 @@ function N(s, i = !1, l) {
     if (!g)
       return;
     const k = g.split("|");
-    e[d] || (e[d] = {}), k.forEach((b) => {
+    e[m] || (e[m] = {}), k.forEach((b) => {
       if (!b)
         return;
       let [E, A] = b.split(/-(.+)/);
       A = x(A, l, E);
       const T = E.split(".");
-      let j = e[d];
+      let j = e[m];
       T.forEach((c, a) => {
         a === T.length - 1 ? j[c] = A : (j[c] || (j[c] = {}), j = j[c]);
       });
@@ -81,7 +81,7 @@ function F(s) {
       default: "(min-width: 1px)",
       ...(s == null ? void 0 : s.breakpoints) || {}
     }
-  }, l = i.dataAttribute, e = s.gsap.core, p = i.breakpoints.default, u = i.breakpoints, m = [], M = [], d = /* @__PURE__ */ new Map(), g = (c) => (c.getAttribute(O()) || "").trim(), k = (c = document) => c.querySelectorAll(O(!0)), O = (c = !1) => `${c ? "[" : ""}${l}${c ? "]" : ""}`;
+  }, l = i.dataAttribute, e = s.gsap.core, p = i.breakpoints.default, u = i.breakpoints, d = [], M = [], m = /* @__PURE__ */ new Map(), g = (c) => (c.getAttribute(O()) || "").trim(), k = (c = document) => c.querySelectorAll(O(!0)), O = (c = !1) => `${c ? "[" : ""}${l}${c ? "]" : ""}`;
   function b(c) {
     const a = /(?:@(\w+):)?tl(?:\/(\w+))?/, f = c.match(a);
     if (f) {
@@ -141,7 +141,7 @@ function F(s) {
       const r = (o = M.find(
         (n) => n.elements.some((h) => h === t) && n.matchMedia
       )) == null ? void 0 : o.matchMedia;
-      m.push(
+      d.push(
         ...Object.entries(E(g(t))).map(
           ([n, h]) => ({
             matchMedia: n ?? r,
@@ -150,13 +150,13 @@ function F(s) {
           })
         )
       );
-    }), m.forEach((t) => {
-      d.has(t.element) || d.set(t.element, {});
+    }), d.forEach((t) => {
+      m.has(t.element) || m.set(t.element, {});
       const r = {
         [t.matchMedia]: t.data
       };
-      d.set(t.element, {
-        ...d.get(t.element),
+      m.set(t.element, {
+        ...m.get(t.element),
         ...r
       });
     });
@@ -198,7 +198,7 @@ function F(s) {
             elements: r.elements,
             timeline: o
           });
-        }), d.forEach((r, o) => {
+        }), m.forEach((r, o) => {
           var w;
           let n = {};
           Object.entries(r).forEach(([y, V]) => {

@@ -2,7 +2,6 @@ import getSelectorFromBracket from "./getSelectorFromBracket.ts";
 import castValue from "./castValue.ts";
 
 function parseToObject(input: string, isTimeline = false, element: Element) {
-  // eslint-disable-next-line
   const result: Record<string, any> = {};
 
   const segments = input.split(" ");
@@ -41,7 +40,6 @@ function parseToObject(input: string, isTimeline = false, element: Element) {
 
     properties.forEach((property) => {
       if (!property) return;
-      // eslint-disable-next-line
       let [key, value]: any = property.split(/-(.+)/);
 
       value = castValue(value, element, key);

@@ -29,7 +29,7 @@ function glaze(config: GlazeConfig) {
 
   const elements: GlazeAnimationCollection[] = [];
   const timelines: GlazeTimeline[] = [];
-  const data: Map<
+  const animations: Map<
     Element,
     {
       [key: string]: GlazeAnimationObject;
@@ -151,23 +151,23 @@ function glaze(config: GlazeConfig) {
     });
 
     elements.forEach((element) => {
-      if (!data.has(element.element)) {
-        data.set(element.element, {});
+      if (!animations.has(element.element)) {
+        animations.set(element.element, {});
       }
 
-      const d = {
+      const data = {
         [element.matchMedia]: element.data,
       };
-      data.set(element.element, {
-        ...data.get(element.element),
-        ...d,
+      animations.set(element.element, {
+        ...animations.get(element.element),
+        ...data,
       });
     });
 
     console.log("matchMedias:", matchMedias);
     console.log("timelines:", timelines);
     console.log("elements:", elements);
-    console.log("data", data);
+    console.log("animations", animations);
   }
 
   function init() {
@@ -228,7 +228,7 @@ function glaze(config: GlazeConfig) {
           });
         });
 
-        data.forEach((value, element) => {
+        animations.forEach((value, element) => {
           let animationObject = {};
 
           Object.entries(value).forEach(([key, value]) => {

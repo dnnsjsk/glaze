@@ -12,7 +12,9 @@ type GlazeAnimationObject = {
 };
 
 type GlazeConfig = {
-  breakpoints?: { [key: string]: string };
+  breakpoints?: {
+    [key: string]: string;
+  };
   dataAttribute?: string;
   gsap: { core: typeof import("gsap").gsap };
 };
