@@ -19,7 +19,7 @@ const config: DocsThemeConfig = {
       },
     };
   },
-  docsRepositoryBase: "https://github.com/dnnsjsk/glaze/docs",
+  docsRepositoryBase: "https://github.com/dnnsjsk/glaze/blob/main/docs",
   head: function useHead() {
     const { title } = useConfig();
     const socialCard = "https://glaze.dev/og.jpg";
