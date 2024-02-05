@@ -35,14 +35,12 @@ const config: DocsThemeConfig = {
         <meta name="twitter:image" content={socialCard} />
         <meta name="twitter:site:domain" content="glaze.dev" />
         <meta name="twitter:url" content="https://glaze.dev" />
-        <meta
-          name="og:title"
-          content={title ? title + " – Glaze" : "Glaze"}
-        />
+        <meta name="og:title" content={title ? title + " – Glaze" : "Glaze"} />
         <meta name="og:image" content={socialCard} />
         <meta name="apple-mobile-web-app-title" content="Glaze" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.png" type="image/png" />
+        <title>{title ? title + " – Glaze" : "Glaze"}</title>
       </>
     );
   },

@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shuding/nextra-docs-template.git"
+    "url": "git+https://github.com/dnnsjsk/glaze.git"
   },
   "author": "Dennis Josek <hi@dennn.is>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shuding/nextra-docs-template/issues"
+    "url": "https://github.com/dnnsjsk/glaze/issues"
   },
-  "homepage": "https://github.com/shuding/nextra-docs-template#readme",
+  "homepage": "https://glaze.dev",
   "dependencies": {
     "gsap": "^3.12.5",
     "next": "^14.1.0",
