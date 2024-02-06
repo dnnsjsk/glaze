@@ -5,7 +5,9 @@ import { glaze } from "./src";
 gsap.registerPlugin(ScrollTrigger);
 
 glaze({
-  gsap: { core: gsap },
+  lib: {
+    gsap: { core: gsap },
+  },
   breakpoints: {
     sm: "(min-width: 640px)",
     md: "(min-width: 768px)",

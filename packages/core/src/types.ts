@@ -17,7 +17,11 @@ type GlazeConfig = {
   };
   dataAttribute?: string;
   element?: Document | Element;
-  gsap: { core: typeof import("gsap").gsap };
+  lib: {
+    gsap: {
+      core: typeof import("gsap").gsap;
+    };
+  };
 };
 
 type GlazeObjectSettings = {

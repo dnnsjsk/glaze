@@ -1,9 +1,16 @@
 import { GlazeAnimationCollection, GlazeAnimationObject, GlazeConfig, GlazeTimeline, PlainObject } from './types.ts';
 declare function glaze(config: GlazeConfig): {
-    init: () => void;
+    start: () => void;
     kill: () => void;
     restart: () => void;
     data: {
+        state: Omit<GlazeConfig, "gsap"> & {
+            element: Document | Element;
+            breakpoints: {
+                [key: string]: string;
+                default: string;
+            };
+        };
         breakpoints: {
             [key: string]: string | undefined;
             default?: string | undefined;

@@ -1,0 +1,13 @@
+{
+  "index": "Introduction",
+  "install": "Install",
+  "-- Usage": {
+    "type": "separator",
+    "title": "Usage"
+  },
+  "syntax": "Syntax",
+  "breakpoints": "Breakpoints",
+  "timelines": "Timelines",
+  "scrolltrigger": "ScrollTrigger",
+  "programmatic-use": "Programmatic use"
+}

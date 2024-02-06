@@ -61,7 +61,7 @@ describe("glaze", () => {
     `;
     container = document.getElementById("test-container") as HTMLElement;
     glazeInstance = glaze({
-      gsap: { core: gsap },
+      lib: { gsap: { core: gsap } },
       breakpoints: {
         default: "(min-width: 640px)",
         md: "(min-width: 768px)",
@@ -77,7 +77,7 @@ describe("glaze", () => {
   });
 
   it("returns correct base element", () => {
-    expect(glazeInstance.data.element).toBe(container);
+    expect(glazeInstance.data.state.element).toBe(container);
   });
 
   it("returns correct default breakpoint", () => {

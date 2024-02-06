@@ -12,7 +12,7 @@ const Example = ({ children }) => {
     gsap.registerPlugin(ScrollTrigger);
 
     glaze({
-      gsap: { core: gsap },
+      lib: { gsap: { core: gsap } },
       element: ref.current,
       breakpoints: {
         sm: "(min-width: 640px)",

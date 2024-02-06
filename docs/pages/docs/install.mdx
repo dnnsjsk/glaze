@@ -1,0 +1,35 @@
+# Install
+
+```bash copy
+npm install @glaze/core gsap
+```
+
+## Setup
+
+```js copy
+import gsap from "gsap";
+import { glaze } from "@glaze/core";
+
+glaze({
+  lib: {
+    gsap: {
+      core: gsap,
+    },
+  },
+});
+```
+
+## Config
+
+```js copy
+glaze({
+  // the root element which will be searched for elements
+  element: document,
+  // the attribute to search for
+  dataAttribute: "data-animate",
+  // custom breakpoints
+  breakpoints: {
+    default: "(min-width: 1px)",
+  },
+});
+```
