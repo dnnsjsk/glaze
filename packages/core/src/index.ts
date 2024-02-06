@@ -8,6 +8,8 @@ import {
 import getSelectorOrElement from "@/utils/getSelectorOrElement.ts";
 import mergeDeep from "@/utils/mergeDeep.ts";
 import parseToObject from "@/utils/parseToObject.ts";
+import parseTimeline from "@/utils/parseTimeline.ts";
+import parseMediaQueries from "@/utils/parseMediaQueries.ts";
 
 function glaze(config: GlazeConfig) {
   if (!config.gsap?.core) {
@@ -57,50 +59,6 @@ function glaze(config: GlazeConfig) {
   const getAttributeString = (withBrackets = false) =>
     `${withBrackets ? "[" : ""}${state.dataAttribute}${withBrackets ? "]" : ""}`;
 
-  function parseTimeline(input: string) {
-    const regex = /(?:@(\w+):)?tl(?:\/(\w+))?/;
-    const match = input.match(regex);
-
-    if (match) {
-      const breakpoint = match[1];
-      const id = match[2] ?? "";
-      const result = { id, breakpoint: defaultBp };
-
-      if (breakpoint) {
-        if (!breakpoints?.[breakpoint]) return null;
-        result.breakpoint = breakpoints[breakpoint];
-      }
-
-      return result;
-    } else {
-      return null;
-    }
-  }
-
-  function parseMediaQueries(input: string) {
-    const results: {
-      [key: string]: string[];
-    } = {};
-    const segments = input.split(" ");
-
-    segments.forEach((segment) => {
-      const match = segment.match(/@(\w+):/);
-      if (!match) {
-        if (!results[defaultBp]) results[defaultBp] = [];
-        results[defaultBp].push(segment);
-        return;
-      }
-
-      const breakpoint = match[1];
-      if (!breakpoints?.[breakpoint]) return;
-      if (!results[breakpoints[breakpoint]])
-        results[breakpoints[breakpoint]] = [];
-
-      results[breakpoints[breakpoint]].push(segment.replace(match[0], ""));
-    });
-    return results;
-  }
-
   function collect() {
     const processedElements: Element[] = [];
     const els = getElements();
@@ -113,7 +71,7 @@ function glaze(config: GlazeConfig) {
       const attributes = data.split(" ");
 
       if (attributes.some((attr) => matchesTl(attr))) {
-        const timelineData = parseTimeline(data);
+        const timelineData = parseTimeline(data, breakpoints, defaultBp);
         const elementsInTimeline: Element[] = [];
         [
           ...getElements(element),
@@ -153,13 +111,13 @@ function glaze(config: GlazeConfig) {
       )?.breakpoint;
 
       elements.push(
-        ...Object.entries(parseMediaQueries(getAttribute(element))).map(
-          ([key, value]) => ({
-            breakpoint: key ?? timelineMatchMedia,
-            element,
-            data: parseToObject(value.join(" "), false, element),
-          }),
-        ),
+        ...Object.entries(
+          parseMediaQueries(getAttribute(element), breakpoints, defaultBp),
+        ).map(([key, value]) => ({
+          breakpoint: key ?? timelineMatchMedia,
+          element,
+          data: parseToObject(value.join(" "), false, element),
+        })),
       );
     });
 
