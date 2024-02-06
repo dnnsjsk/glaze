@@ -1,5 +1,6 @@
 import { GlazeAnimationCollection, GlazeAnimationObject, GlazeConfig, GlazeTimeline, PlainObject } from './types.ts';
 declare function glaze(config: GlazeConfig): {
+    init: () => void;
     kill: () => void;
     restart: () => void;
     data: {
