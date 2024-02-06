@@ -36,11 +36,12 @@ function glaze(config: GlazeConfig) {
     };
   };
 
-  const initialMm = state.breakpoints.default;
-  const matchMedias = state.breakpoints;
-  const elements: GlazeAnimationCollection[] = [];
-  const timelines: GlazeTimeline[] = [];
-  const animations: Map<
+  const defaultBp = state.breakpoints.default;
+  const breakpoints = state.breakpoints;
+
+  let elements: GlazeAnimationCollection[] = [];
+  let timelines: GlazeTimeline[] = [];
+  let animations: Map<
     Element,
     {
       [key: string]: GlazeAnimationObject;
@@ -61,13 +62,13 @@ function glaze(config: GlazeConfig) {
     const match = input.match(regex);
 
     if (match) {
-      const matchMedia = match[1];
+      const breakpoint = match[1];
       const id = match[2] ?? "";
-      const result = { id, matchMedia: initialMm };
+      const result = { id, breakpoint: defaultBp };
 
-      if (matchMedia) {
-        if (!matchMedias?.[matchMedia]) return null;
-        result.matchMedia = matchMedias[matchMedia];
+      if (breakpoint) {
+        if (!breakpoints?.[breakpoint]) return null;
+        result.breakpoint = breakpoints[breakpoint];
       }
 
       return result;
@@ -85,17 +86,17 @@ function glaze(config: GlazeConfig) {
     segments.forEach((segment) => {
       const match = segment.match(/@(\w+):/);
       if (!match) {
-        if (!results[initialMm]) results[initialMm] = [];
-        results[initialMm].push(segment);
+        if (!results[defaultBp]) results[defaultBp] = [];
+        results[defaultBp].push(segment);
         return;
       }
 
-      const matchMedia = match[1];
-      if (!matchMedias?.[matchMedia]) return;
-      if (!results[matchMedias[matchMedia]])
-        results[matchMedias[matchMedia]] = [];
+      const breakpoint = match[1];
+      if (!breakpoints?.[breakpoint]) return;
+      if (!results[breakpoints[breakpoint]])
+        results[breakpoints[breakpoint]] = [];
 
-      results[matchMedias[matchMedia]].push(segment.replace(match[0], ""));
+      results[breakpoints[breakpoint]].push(segment.replace(match[0], ""));
     });
     return results;
   }
@@ -135,8 +136,9 @@ function glaze(config: GlazeConfig) {
         timelines.push({
           id: timelineData?.id || Math.random().toString(36).substring(2, 15),
           data: parsedData,
-          matchMedia: timelineData?.matchMedia || initialMm,
+          breakpoint: timelineData?.breakpoint || defaultBp,
           elements: elementsInTimeline,
+          timeline: gsap.timeline(parsedData),
         });
 
         return;
@@ -147,13 +149,13 @@ function glaze(config: GlazeConfig) {
       if (processedElements.includes(element)) return;
       const timelineMatchMedia = timelines.find(
         (timeline) =>
-          timeline.elements.some((el) => el === element) && timeline.matchMedia,
-      )?.matchMedia;
+          timeline.elements.some((el) => el === element) && timeline.breakpoint,
+      )?.breakpoint;
 
       elements.push(
         ...Object.entries(parseMediaQueries(getAttribute(element))).map(
           ([key, value]) => ({
-            matchMedia: key ?? timelineMatchMedia,
+            breakpoint: key ?? timelineMatchMedia,
             element,
             data: parseToObject(value.join(" "), false, element),
           }),
@@ -167,7 +169,7 @@ function glaze(config: GlazeConfig) {
       }
 
       const data = {
-        [element.matchMedia]: element.data,
+        [element.breakpoint]: element.data,
       };
       animations.set(element.element, {
         ...animations.get(element.element),
@@ -175,13 +177,16 @@ function glaze(config: GlazeConfig) {
       });
     });
 
-    console.log("matchMedias:", matchMedias);
+    console.log("breakpoints:", breakpoints);
     console.log("timelines:", timelines);
     console.log("elements:", elements);
     console.log("animations", animations);
   }
 
   function init() {
+    clear();
+    collect();
+
     const mm: gsap.MatchMedia = gsap.matchMedia();
 
     const applyAnimationSet = (
@@ -221,24 +226,11 @@ function glaze(config: GlazeConfig) {
     mm.add(
       Object.fromEntries(
         Object.values({
-          ...{ [initialMm]: initialMm },
-          ...(matchMedias || {}),
+          ...{ [defaultBp]: defaultBp },
+          ...(breakpoints || {}),
         }).map((key) => [key, key]),
       ),
       (context) => {
-        const tls: {
-          elements: Element[];
-          timeline: gsap.core.Timeline;
-        }[] = [];
-
-        timelines.forEach((timeline) => {
-          const tl = gsap.timeline(timeline.data || {});
-          tls.push({
-            elements: timeline.elements,
-            timeline: tl,
-          });
-        });
-
         animations.forEach((value, element) => {
           let animationObject = {};
 
@@ -248,7 +240,7 @@ function glaze(config: GlazeConfig) {
             }
           });
 
-          const timeline = tls.find(({ elements }) =>
+          const timeline = timelines.find(({ elements }) =>
             elements.includes(element),
           )?.timeline;
 
@@ -258,8 +250,41 @@ function glaze(config: GlazeConfig) {
     );
   }
 
-  collect();
+  function clear() {
+    elements = [];
+    timelines = [];
+    animations = new Map();
+  }
+
+  function kill() {
+    timelines.forEach(({ timeline }) => {
+      timeline.kill();
+    });
+    animations.forEach((_value, element) => {
+      gsap.killTweensOf(element);
+    });
+    clear();
+  }
+
+  function restart() {
+    kill();
+    collect();
+    init();
+  }
+
   init();
+
+  return {
+    init,
+    kill,
+    restart,
+    data: {
+      breakpoints,
+      elements,
+      timelines,
+      animations,
+    },
+  };
 }
 
 export { glaze };

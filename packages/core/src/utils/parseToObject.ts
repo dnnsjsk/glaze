@@ -3,7 +3,6 @@ import castValue from "./castValue.ts";
 
 function parseToObject(input: string, isTimeline = false, element: Element) {
   const result: Record<string, any> = {};
-
   const segments = input.split(" ");
 
   segments.forEach((segment) => {

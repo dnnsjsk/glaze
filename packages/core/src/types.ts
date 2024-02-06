@@ -1,7 +1,7 @@
 type GlazeAnimationCollection = {
   data: GlazeAnimationObject;
   element: Element;
-  matchMedia: string;
+  breakpoint: string;
 };
 
 type GlazeAnimationObject = {
@@ -28,7 +28,8 @@ type GlazeTimeline = {
   id: string;
   data: GlazeObjectSettings;
   elements: Element[];
-  matchMedia: string;
+  breakpoint: string;
+  timeline: typeof import("gsap").gsap.core.Timeline.prototype;
 };
 
 type PlainObject = { [key: string]: any };
