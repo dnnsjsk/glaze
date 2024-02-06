@@ -1,5 +1,6 @@
 import { defineConfig, ViteDevServer } from "vite";
 import dts from "vite-plugin-dts";
+import { resolve } from "path";
 
 const forceFullReloadPlugin = () => {
   return {
@@ -16,6 +17,11 @@ const forceFullReloadPlugin = () => {
 };
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "./src"),
+    },
+  },
   build: {
     lib: {
       entry: "./src/index.ts",
@@ -34,4 +40,8 @@ export default defineConfig({
       include: ["./src/index.ts"],
     }),
   ],
+  test: {
+    globals: true,
+    environment: "jsdom",
+  },
 });

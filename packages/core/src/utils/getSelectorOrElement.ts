@@ -1,4 +1,4 @@
-import { GlazeAnimationObject } from "../types.ts";
+import { GlazeAnimationObject } from "@/types.ts";
 
 function getSelectorOrElement(
   element: Element,
@@ -10,7 +10,7 @@ function getSelectorOrElement(
   if (selector) {
     const startsWithAnd = selector.startsWith("&");
     if (startsWithAnd) {
-      const string = selector?.replace("&", ":scope");
+      const string = selector?.replace("&", ":scope ");
       if (single) return element.querySelector(string);
       return element.querySelectorAll(string);
     }

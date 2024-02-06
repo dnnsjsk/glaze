@@ -4,10 +4,10 @@ import {
   GlazeConfig,
   GlazeTimeline,
   PlainObject,
-} from "./types.ts";
-import getSelectorOrElement from "./utils/getSelectorOrElement.ts";
-import mergeDeep from "./utils/mergeDeep.ts";
-import parseToObject from "./utils/parseToObject.ts";
+} from "@/types.ts";
+import getSelectorOrElement from "@/utils/getSelectorOrElement.ts";
+import mergeDeep from "@/utils/mergeDeep.ts";
+import parseToObject from "@/utils/parseToObject.ts";
 
 function glaze(config: GlazeConfig) {
   if (!config.gsap?.core) {

@@ -1,4 +1,4 @@
-import { PlainObject } from "../types.ts";
+import { PlainObject } from "@/types.ts";
 import isObject from "./isObject.ts";
 
 function mergeDeep(
@@ -10,6 +10,10 @@ function mergeDeep(
 
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
+      if (key === "__proto__" || key === "constructor" || key === "prototype") {
+        continue;
+      }
+
       if (isObject(source[key])) {
         if (!target[key]) Object.assign(target, { [key]: {} });
         mergeDeep(target[key], source[key]);

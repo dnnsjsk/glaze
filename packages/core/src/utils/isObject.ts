@@ -1,8 +1,6 @@
-import { PlainObject } from "../types.ts";
-
-function isObject(item: PlainObject): item is PlainObject {
+function isObject(item: any): item is Record<string, any> {
   return (
-    item &&
+    item !== null &&
     typeof item === "object" &&
     !Array.isArray(item) &&
     !(item instanceof HTMLElement)
