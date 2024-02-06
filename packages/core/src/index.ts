@@ -12,7 +12,7 @@ import parseTimeline from "@/utils/parseTimeline.ts";
 import parseMediaQueries from "@/utils/parseMediaQueries.ts";
 
 function glaze(config: GlazeConfig) {
-  if (!config.gsap?.core) {
+  if (!config || !config.gsap?.core) {
     throw new Error("GSAP not found");
   }
 
@@ -141,7 +141,7 @@ function glaze(config: GlazeConfig) {
     console.log("animations", animations);
   }
 
-  function init() {
+  function start() {
     clear();
     collect();
 
@@ -227,16 +227,17 @@ function glaze(config: GlazeConfig) {
   function restart() {
     kill();
     collect();
-    init();
+    start();
   }
 
-  init();
+  start();
 
   return {
-    init,
+    start,
     kill,
     restart,
     data: {
+      element: state.element,
       breakpoints,
       elements,
       timelines,
