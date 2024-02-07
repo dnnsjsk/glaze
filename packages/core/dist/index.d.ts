@@ -25,5 +25,5 @@ declare function glaze(config: GlazeConfig): {
         }>;
     };
 };
-export { glaze };
+export default glaze;
 export type { GlazeAnimationCollection, GlazeAnimationObject, GlazeConfig, GlazeTimeline, PlainObject, };

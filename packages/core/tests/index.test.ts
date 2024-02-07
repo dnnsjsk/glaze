@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { glaze } from "../src";
+import glaze from "../src";
 import { gsap } from "gsap";
 
 vi.mock("gsap", () => {

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { glaze } from "glaze";
+import glaze from "glazejs";
 import gsap from "gsap";
 
 function LetterSplitter({ text }) {
