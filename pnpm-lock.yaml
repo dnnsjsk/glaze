@@ -14,7 +14,7 @@ importers:
 
   docs:
     dependencies:
-      glaze:
+      glazejs:
         specifier: workspace:*
         version: link:../packages/core
       gsap:
@@ -63,6 +63,12 @@ importers:
       postcss-nesting:
         specifier: ^12.0.2
         version: 12.0.2(postcss@8.4.33)
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
+      prettier-plugin-tailwindcss:
+        specifier: ^0.5.11
+        version: 0.5.11(prettier@3.2.5)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1
@@ -78,9 +84,6 @@ importers:
       prettier:
         specifier: ^3.2.5
         version: 3.2.5
-      prettier-plugin-tailwindcss:
-        specifier: ^0.5.11
-        version: 0.5.11(prettier@3.2.5)
       terser:
         specifier: ^5.27.0
         version: 5.27.0
