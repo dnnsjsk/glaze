@@ -8,6 +8,5 @@
   "syntax": "Syntax",
   "breakpoints": "Breakpoints",
   "timelines": "Timelines",
-  "scrolltrigger": "ScrollTrigger",
-  "programmatic-use": "Programmatic use"
+  "scrolltrigger": "ScrollTrigger"
 }
