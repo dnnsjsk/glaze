@@ -6,12 +6,13 @@
 :root {
   --nextra-primary-hue: 40deg;
   --shiki-color-text: #c9c8c0 !important;
+  --shiki-token-comment: #6a737d !important;
+  --shiki-token-constant: #d4bfff !important;
   --shiki-token-function: #ffb454 !important;
-  --shiki-token-string-expression: #aad94c !important;
   --shiki-token-keyword: #bfbdb6b3 !important;
   --shiki-token-punctuation: #bfbdb6b3 !important;
+  --shiki-token-string-expression: #aad94c !important;
   --shiki-token-string: #aad94c !important;
-  --shiki-token-comment: #6a737d !important;
   font-family: Inter, sans-serif;
   font-feature-settings: 'liga' 1, 'calt' 1;
 }
@@ -25,6 +26,7 @@
 html {
   font-feature-settings: "calt", "cv02", "cv03", "cv04", "cv11" !important;
   font-variation-settings: normal !important;
+  scroll-padding-top: calc(var(--nextra-navbar-height) + 1rem) !important;
 }
 
 body,
@@ -49,6 +51,18 @@ body,
   @apply bg-white !important;
 }
 
+#__next, main, main > [dir="ltr"] {
+  @apply min-h-screen;
+}
+
+main > [dir="ltr"] {
+  @apply w-full h-full flex flex-col;
+
+   & > div {
+     @apply w-full;
+   }
+}
+
 h1,
 h2,
 h3,
@@ -68,7 +82,7 @@ ol {
   @apply text-neutral-700 dark:text-neutral-300 !important;
 
   a {
-    @apply font-bold decoration-2 hover:no-underline !important;
+    @apply nx-text-primary-600 font-bold decoration-2 hover:no-underline !important;
   }
 }
 
@@ -104,6 +118,12 @@ kbd {
   }
 }
 
+.nextra-sidebar-container, .nextra-toc {
+  li a {
+    @apply font-medium !important;
+  }
+}
+
 .nextra-sidebar-container {
   @apply dark:bg-black !important;
 }
@@ -116,14 +136,14 @@ kbd {
 }
 
 .nextra-toc {
-  a {
+  a:not(.nx-text-primary-600) {
     @apply bg-transparent text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 !important;
   }
 }
 
 .nextra-search {
   .excerpt {
-    @apply dark:text-neutral-400 !important;
+    @apply font-normal dark:text-neutral-400 !important;
   }
 
   a > div {
@@ -144,5 +164,13 @@ div:has(time) {
 }
 
 footer {
-  @apply hidden;
+  @apply mt-auto;
+}
+
+.button {
+  @apply px-5 py-2.5 text-sm block w-max rounded-full border border-transparent font-semibold transition ease-in duration-100;
+}
+
+.link {
+  @apply inline-block font-bold underline decoration-2 !important;
 }

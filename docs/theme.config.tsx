@@ -10,12 +10,15 @@ const config: DocsThemeConfig = {
   project: {
     link: "https://github.com/dnnsjsk/glaze",
   },
+  search: {
+    placeholder: "Search",
+  },
   useNextSeoProps: () => {
     const { title } = useConfig();
 
     return {
       openGraph: {
-        title: title === 'Index' ? title : `${title} - Glaze`,
+        title: title === "Index" ? title : `${title} - Glaze`,
       },
     };
   },
@@ -52,7 +55,14 @@ const config: DocsThemeConfig = {
     );
   },
   footer: {
-    text: "Glaze",
+    text: (
+      <p className="mx-auto text-center">
+        MIT License © 2024{" "}
+        <a href="https://dennn.is" target="_blank" className="link">
+          Dennis Josek
+        </a>
+      </p>
+    ),
   },
 };
 

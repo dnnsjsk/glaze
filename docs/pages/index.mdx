@@ -1,1 +1,71 @@
-# Hello
+---
+title: Utility-based animations for the web - Glaze
+---
+
+import Hero from "../components/Hero";
+import HeroCode from "../components/HeroCode.mdx";
+
+<div className="mx-auto my-12 flex max-w-screen-xl flex-col items-center justify-center space-y-12 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)] md:my-16 md:space-y-16 lg:my-20 lg:space-y-20 xl:my-24 xl:space-y-24">
+  <div className="grid items-center gap-12 xl:grid-cols-[1.5fr,2fr]">
+    <Hero />
+    <div className="nextra-code-block xl:!mx-0 [&_pre]:grid [&_pre]:overflow-x-auto [&_pre]:bg-neutral-950 [&_pre]:p-8 ">
+      <HeroCode />
+    </div>
+  </div>
+  <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
+    {[
+      {
+        emoji: "🚀",
+        title: "Based on GSAP",
+        description:
+          "Glaze is built on top of <a class='link' target='_blank' href='https://gsap.com/'>GSAP</a>, a powerful animation library that allows you to create complex animations with little code.",
+      },
+      {
+        emoji: "🎨",
+        title: "Utility inspired",
+        description:
+          "If you know Tailwind, you'll feel right at home with Glaze. It is inspired by its utility-first approach.",
+      },
+      {
+        emoji: "📱",
+        title: "Breakpoints",
+        description:
+          "Create responsive animations by defining different animations for different breakpoints.",
+      },
+      {
+        emoji: "🔗",
+        title: "Timelines",
+        description:
+          "Timelines are fully supported, allowing you to create complex sequences of animations with ease.",
+      },
+      {
+        emoji: "🔍",
+        title: "Dot notation",
+        description:
+          "Use dot notation to access all available animation properties, even when deeply nested",
+      },
+      {
+        emoji: "📚",
+        title: "Library agnostic syntax",
+        description:
+          "While Glaze currently supports only GSAP, its syntax is designed to be library agnostic, allowing for potential future expansion to include other animation libraries.",
+      },
+    ].map((item) => {
+      return (
+        <div
+          key={item.title}
+          className="space-y-2 rounded-lg bg-gray-100 p-4 sm:rounded-xl sm:p-6 lg:rounded-3xl lg:p-8"
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-black/5 text-2xl">
+            {item.emoji}
+          </div>
+          <h3 className="text-lg !font-semibold">{item.title}</h3>
+          <p
+            className="text-neutral-500"
+            dangerouslySetInnerHTML={{ __html: item.description }}
+          />
+        </div>
+      );
+    })}
+  </div>
+</div>

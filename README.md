@@ -19,10 +19,10 @@ compose animations for the web.
   [matchMedia](<https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/>).
 - **Timelines** Compose timelines using `@tl`.
 - **Dot notation** Use dot notation to control nested properties inside the
-  animation object, e.g.
-  `to:scale-1.5|scrollTrigger.trigger-[&]`.
-- **Library agnostic** Can be extended to work with other animation libraries. (coming soon)
+  animation object, e.g. `to:scale-1.5|scrollTrigger.trigger-[&]`.
 - **Lightweight** ~3kb minified and gzipped.
+- **Library agnostic** Can be extended to work with other animation libraries.
+  (coming soon)
 
 ## Credits
 
