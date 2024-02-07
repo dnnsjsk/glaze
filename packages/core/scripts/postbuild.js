@@ -1,5 +1,6 @@
 const fs = require("fs");
 const terser = require("terser");
+const path = require("path");
 
 async function minifyFile(filePath) {
   const originalCode = fs.readFileSync(filePath, "utf8");
@@ -14,3 +15,15 @@ async function minifyFile(filePath) {
 }
 
 minifyFile("./dist/index.es.js");
+
+fs.copyFile(
+  path.join(__dirname, "../../../README.md"),
+  path.join(__dirname, "../README.md"),
+  (err) => {
+    if (err) {
+      console.error("Error occurred:", err);
+      return;
+    }
+    console.log("README.md was copied successfully.");
+  },
+);

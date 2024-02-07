@@ -3,7 +3,7 @@
 Glaze is an animation framework that combines the power of
 [GSAP](https://greensock.com/gsap/) and utility-based document authoring à la
 [Tailwind](https://tailwindcss.com) to create a simple, yet powerful, way to
-compose animations for the web.
+compose declarative animations for the web.
 
 ```html copy
 <div

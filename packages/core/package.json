@@ -1,11 +1,13 @@
 {
   "name": "glazejs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Utility-based animations for the web.",
+  "author": "Dennis Josek <hi@dennn.is> (https://dennn.is)",
   "scripts": {
     "dev": "vite",
+    "test": "vitest",
     "build": "vitest --watch=false && tsc && vite build && node scripts/postbuild.js",
-    "test": "vitest"
+    "release": "npm run build && npm publish"
   },
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",

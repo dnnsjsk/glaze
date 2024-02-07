@@ -8,5 +8,6 @@
   "syntax": "Syntax",
   "breakpoints": "Breakpoints",
   "timelines": "Timelines",
-  "scrolltrigger": "ScrollTrigger"
+  "scrolltrigger": "ScrollTrigger",
+  "changelog": "Changelog"
 }
