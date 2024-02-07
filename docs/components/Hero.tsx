@@ -39,7 +39,7 @@ const Hero = () => {
       </h1>
       <div className="flex flex-wrap gap-4">
         <div className="button bg-gray-100 font-mono text-black dark:bg-neutral-900 dark:text-white">
-          npm i @glaze/core
+          npm i glazejs
         </div>
         <a
           href="/documentation"
