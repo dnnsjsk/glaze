@@ -54,14 +54,14 @@ import HeroCode from "../components/HeroCode.mdx";
       return (
         <div
           key={item.title}
-          className="space-y-2 rounded-lg bg-gray-100 p-4 sm:rounded-xl sm:p-6 lg:rounded-3xl lg:p-8"
+          className="space-y-2 rounded-lg bg-gray-100 p-4 dark:bg-neutral-900 sm:rounded-xl sm:p-6 lg:rounded-3xl lg:p-8"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-black/5 text-2xl">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-black/5 text-2xl dark:bg-white/5">
             {item.emoji}
           </div>
-          <h3 className="text-lg !font-semibold">{item.title}</h3>
+          <h3 className="text-lg !font-bold">{item.title}</h3>
           <p
-            className="text-neutral-500"
+            className="text-neutral-500 dark:text-neutral-600"
             dangerouslySetInnerHTML={{ __html: item.description }}
           />
         </div>
