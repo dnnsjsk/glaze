@@ -16,14 +16,21 @@ async function minifyFile(filePath) {
 
 minifyFile("./dist/index.es.js");
 
-fs.copyFile(
-  path.join(__dirname, "../../../README.md"),
-  path.join(__dirname, "../README.md"),
-  (err) => {
+[
+  {
+    from: path.join(__dirname, "../../../README.md"),
+    to: path.join(__dirname, "../README.md"),
+  },
+  {
+    from: path.join(__dirname, "../../../CHANGELOG.md"),
+    to: path.join(__dirname, "../../../docs/pages/documentation/changelog.mdx"),
+  },
+].forEach(({ from, to }) => {
+  fs.copyFile(from, to, (err) => {
     if (err) {
       console.error("Error occurred:", err);
       return;
     }
-    console.log("README.md was copied successfully.");
-  },
-);
+    console.log(`${from} was copied successfully.`);
+  });
+});
