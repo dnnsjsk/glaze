@@ -1,6 +1,7 @@
 {
   "name": "glazejs",
-  "version": "0.1.1",
+  "version": "0.1.4",
+  "description": "Utility-based animations for the web.",
   "scripts": {
     "dev": "vite",
     "build": "vitest --watch=false && tsc && vite build && node scripts/postbuild.js",
@@ -17,5 +18,25 @@
     "vite": "^5.0.12",
     "vite-plugin-dts": "^3.7.2",
     "vitest": "^1.2.2"
-  }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "glaze",
+    "glazejs",
+    "animation",
+    "web",
+    "utility",
+    "gsap"
+  ],
+  "homepage": "https://glaze.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dnnsjsk/glaze"
+  },
+  "bugs": {
+    "url": "https://github.com/dnnsjsk/glaze/issues"
+  },
+  "license": "MIT"
 }
