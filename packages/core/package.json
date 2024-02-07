@@ -1,6 +1,6 @@
 {
   "name": "glazejs",
-  "version": "0.1.6",
+  "version": "1.0.0",
   "description": "Utility-based animations for the web.",
   "author": "Dennis Josek <hi@dennn.is> (https://dennn.is)",
   "scripts": {
