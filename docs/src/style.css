@@ -84,6 +84,10 @@ ol {
   a {
     @apply font-bold decoration-2 hover:no-underline !important;
   }
+
+  strong {
+    @apply text-black dark:text-white !important;
+  }
 }
 
 [title="Another Page"] {

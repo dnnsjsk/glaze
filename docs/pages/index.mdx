@@ -5,14 +5,14 @@ title: Utility-based animations for the web - Glaze
 import Hero from "../components/Hero";
 import HeroCode from "../components/HeroCode.mdx";
 
-<div className="mx-auto my-12 flex max-w-screen-xl flex-col items-center justify-center space-y-12 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)] md:my-16 md:space-y-16 lg:my-20 lg:space-y-20 xl:my-24 xl:space-y-24">
-  <div className="grid items-center gap-12 xl:grid-cols-[1.5fr,2fr]">
+<div className="relative mx-auto my-12 flex max-w-screen-xl flex-col items-center justify-center space-y-12 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)] md:my-16 md:space-y-16 lg:my-20 lg:space-y-20 xl:my-24 xl:space-y-24">
+  <div className="relative z-10 grid items-center gap-12 xl:grid-cols-[1.5fr,2fr]">
     <Hero />
     <div className="nextra-code-block xl:!mx-0 [&_pre]:grid [&_pre]:overflow-x-auto [&_pre]:bg-neutral-950 [&_pre]:p-8 ">
       <HeroCode />
     </div>
   </div>
-  <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
+  <div className="relative z-10 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
     {[
       {
         emoji: "🚀",
