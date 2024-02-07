@@ -1,23 +1,23 @@
 {
   "name": "glaze-docs",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Glaze docs",
+  "author": "Dennis Josek <hi@dennn.is> (https://dennn.is)",
+  "homepage": "https://glaze.dev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dnnsjsk/glaze.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dnnsjsk/glaze/issues"
+  },
   "scripts": {
     "predev": "rm -rf .next || true",
     "dev": "npm run predev && next dev",
     "build": "next build",
     "start": "next start"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dnnsjsk/glaze.git"
-  },
-  "author": "Dennis Josek <hi@dennn.is>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/dnnsjsk/glaze/issues"
-  },
-  "homepage": "https://glaze.dev",
   "dependencies": {
     "gsap": "^3.12.5",
     "next": "^14.1.0",
