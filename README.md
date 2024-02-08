@@ -29,6 +29,14 @@ compose declarative animations for the web.
 The API and syntax of Glaze is heavily inspired by [Tailwind](https://tailwindcss.com)
 and [MasterCSS](https://css.master.co/).
 
-To use Glaze, you must also include GSAP in your project.
-GSAP is subject to its own licensing terms, which can be found here:
-[GSAP Standard License](https://gsap.com/community/standard-license/).
+## Licensing and Requirements
+
+Glaze is designed to work seamlessly with [GSAP](https://greensock.com/gsap/), a powerful animation library. To use
+Glaze, you must include GSAP in your project.
+
+### GSAP Licensing
+
+GSAP is subject to its own licensing terms. Before incorporating GSAP with Glaze, ensure you review and comply with
+these terms, available here: [GSAP Standard License](https://gsap.com/community/standard-license/).
+
+Glaze itself is licensed under the MIT License. For more details, see the LICENSE file in this repository.
