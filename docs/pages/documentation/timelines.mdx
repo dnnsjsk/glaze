@@ -7,8 +7,8 @@ Glaze.
 
 ## Usage
 
-Begin by declaring a timeline with the `tl` keyword. Upon recognizing a
-timeline, Glaze interprets subsequent strings as options for configuring the
+Start with the `tl` keyword inside the data attribute to establish a timeline.
+Glaze then treats the following strings as configuration options for this
 timeline.
 
 ```html copy
@@ -96,6 +96,9 @@ screen sizes.
 Assign a name to your timeline to link animations from external elements,
 thereby extending the timeline's scope beyond its original container.
 
+In the example below, the named timeline (`main`) allows for animations defined
+on other elements to join the timeline using the `tl:{name}` syntax.
+
 ```html copy
 <div class="grid w-full grid-cols-2 justify-items-center">
   <div
@@ -147,6 +150,3 @@ thereby extending the timeline's scope beyond its original container.
 </div>
 `}
 </Example>
-
-This named timeline (`main`) allows for animations defined on other elements to
-join the timeline using the `tl:{name}` syntax.
