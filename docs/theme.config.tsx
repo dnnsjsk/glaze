@@ -50,7 +50,7 @@ const config: DocsThemeConfig = {
         <meta name="apple-mobile-web-app-title" content="Glaze" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.png" type="image/png" />
-        <title>{title ? title + " – Glaze" : "Glaze"}</title>
+        <title>{title !== "Index" ? title + " – Glaze" : "Glaze"}</title>
       </>
     );
   },
