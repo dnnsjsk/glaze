@@ -18,7 +18,7 @@ const config: DocsThemeConfig = {
 
     return {
       openGraph: {
-        title: title === "Index" ? title : `${title} - Glaze`,
+        title: title === "Index" ? "Glaze" : `${title} - Glaze`,
       },
     };
   },
