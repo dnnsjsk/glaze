@@ -5,12 +5,13 @@ function getSelectorOrElement(
   data: GlazeAnimationObject | string,
   single = false,
 ) {
-  const selector = typeof data !== "string" ? data?.selector?.value : "";
+  let selector = typeof data !== "string" ? data?.selector?.value : "";
 
   if (selector) {
+    selector = selector.replaceAll("_", " ");
     const startsWithAnd = selector.startsWith("&");
     if (startsWithAnd) {
-      const string = selector?.replace("&", ":scope ");
+      const string = selector?.replace("&", ":scope");
       if (single) return element.querySelector(string);
       return element.querySelectorAll(string);
     }

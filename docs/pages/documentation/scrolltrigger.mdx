@@ -2,6 +2,16 @@ import Example from "../../components/Example";
 
 # ScrollTrigger
 
+ScrollTrigger needs to be registered with GSAP before it can be used. This can
+be done by importing it from the `gsap` package and calling `registerPlugin`
+with it.
+
+```js
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
+```
+
 There is no special syntax needed to use
 [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) with Glaze.
 Since it is defined inside the `scrollTrigger` property of the animation object,

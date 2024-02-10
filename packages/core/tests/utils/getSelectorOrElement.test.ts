@@ -26,17 +26,17 @@ describe("getSelectorOrElement", () => {
     expect(result).toBe(container);
   });
 
-  it('queries a single element within the container if the selector starts with "&" and single is true', () => {
-    const data: GlazeAnimationObject = { selector: { value: "&.child" } };
-    const result = getSelectorOrElement(container, data, true);
-    expect(result).toBeInstanceOf(Element);
-    expect(result).toHaveProperty("id", "first-child");
-  });
-
-  it('queries all elements within the container if the selector starts with "&" and single is false', () => {
-    const data: GlazeAnimationObject = { selector: { value: "&.child" } };
+  it('queries all elements within the container if the selector starts with "&" and replace spaces', () => {
+    const data: GlazeAnimationObject = { selector: { value: "&_.child" } };
     const result = getSelectorOrElement(container, data);
     expect(result).toBeInstanceOf(NodeList);
     expect(result).toHaveLength(2);
+  });
+
+  it('queries a single element within the container if the selector starts with "&" and single is true', () => {
+    const data: GlazeAnimationObject = { selector: { value: "&>.child" } };
+    const result = getSelectorOrElement(container, data, true);
+    expect(result).toBeInstanceOf(Element);
+    expect(result).toHaveProperty("id", "first-child");
   });
 });
