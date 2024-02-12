@@ -22,6 +22,7 @@ type GlazeConfig = {
       core: typeof import("gsap").gsap;
     };
   };
+  watch?: boolean;
 };
 
 type GlazeObjectSettings = {
@@ -31,7 +32,7 @@ type GlazeObjectSettings = {
 type GlazeTimeline = {
   id: string;
   data: GlazeObjectSettings;
-  elements: Element[];
+  elements: Map<Element, GlazeAnimationObject>;
   breakpoint: string;
   timeline: typeof import("gsap").gsap.core.Timeline.prototype;
 };

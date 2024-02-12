@@ -25,14 +25,14 @@ function glaze(config: GlazeConfig) {
 
   const state = mergeDeep(
     {
+      breakpoints: { default: "(min-width: 1px)" },
       dataAttribute: "data-animate",
       element: document,
-      breakpoints: {
-        default: "(min-width: 1px)",
-      },
+      watch: false,
     },
     rest,
   ) as Omit<GlazeConfig, "gsap"> & {
+    dataAttribute: string;
     element: Document | Element;
     breakpoints: {
       default: string;
@@ -42,15 +42,7 @@ function glaze(config: GlazeConfig) {
 
   const defaultBp = state.breakpoints.default;
   const breakpoints = state.breakpoints;
-
-  let elements: GlazeAnimationCollection[] = [];
-  let timelines: GlazeTimeline[] = [];
-  let animations: Map<
-    Element,
-    {
-      [key: string]: GlazeAnimationObject;
-    }
-  > = new Map();
+  const timelines: GlazeTimeline[] = [];
 
   const getAttribute = (element: Element) =>
     (element.getAttribute(getAttributeString()) || "").trim();
@@ -61,90 +53,136 @@ function glaze(config: GlazeConfig) {
   const getAttributeString = (withBrackets = false) =>
     `${withBrackets ? "[" : ""}${state.dataAttribute}${withBrackets ? "]" : ""}`;
 
+  const getId = () => Math.random().toString(36).substring(2, 15);
+
+  const matchesTl = (attr: string) =>
+    attr === "tl" || attr.includes("tl/") || attr.endsWith(":tl");
+
+  function watch() {
+    const target = state.element;
+    const observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === state.dataAttribute
+        ) {
+          console.log(mutation.target, "changed", mutation.attributeName);
+        }
+      });
+    });
+
+    const mutationConfig = {
+      attributes: true,
+      attributeFilter: [state.dataAttribute],
+      subtree: true,
+    };
+
+    observer.observe(target, mutationConfig);
+  }
+
+  function getTimelineElement(element: Element) {
+    const data = [
+      ...Object.entries(
+        parseMediaQueries(getAttribute(element), breakpoints, defaultBp),
+      ).map(([key, value]) => ({
+        breakpoint: key,
+        element,
+        data: parseToObject(value.join(" "), false, element),
+      })),
+    ];
+
+    const bps: {
+      [key: string]: GlazeAnimationObject;
+    } = {};
+    data.forEach((el) => {
+      if (!bps?.[el.breakpoint]) bps[el.breakpoint] = {};
+      bps[el.breakpoint] = el.data;
+    });
+
+    return bps;
+  }
+
+  function getTimeline(element: Element) {
+    const processedElements: Element[] = [];
+    const data = getAttribute(element);
+    const attributes = data.split(" ");
+
+    if (attributes.some((attr) => matchesTl(attr))) {
+      const timelineData = parseTimeline(data, breakpoints, defaultBp);
+      const elements = new Map<Element, GlazeAnimationObject>();
+      [
+        ...getElements(element),
+        ...(timelineData?.id
+          ? document.querySelectorAll(
+              `[${state.dataAttribute}*="tl:${timelineData.id}"]`,
+            )
+          : []),
+      ].forEach((el) => {
+        elements.set(el, getTimelineElement(el));
+        processedElements.push(el);
+      });
+
+      const parsedData = parseToObject(
+        attributes.filter((attr) => !matchesTl(attr)).join(" "),
+        true,
+        element,
+      );
+
+      const timelineBp = timelineData?.breakpoint || defaultBp;
+      timelines.push({
+        breakpoint: timelineBp,
+        data: parsedData,
+        elements,
+        id: timelineData?.id || getId(),
+        timeline: gsap.timeline(parsedData),
+      });
+    }
+
+    return processedElements;
+  }
+
   function collect() {
     const processedElements: Element[] = [];
     const els = getElements();
-
-    const matchesTl = (attr: string) =>
-      attr === "tl" || attr.includes("tl/") || attr.endsWith(":tl");
 
     els.forEach((element) => {
       const data = getAttribute(element);
       const attributes = data.split(" ");
 
       if (attributes.some((attr) => matchesTl(attr))) {
-        const timelineData = parseTimeline(data, breakpoints, defaultBp);
-        const elementsInTimeline: Element[] = [];
-        [
-          ...getElements(element),
-          ...(timelineData?.id
-            ? document.querySelectorAll(
-                `[${state.dataAttribute}*="tl:${timelineData.id}"]`,
-              )
-            : []),
-        ].forEach((el) => {
-          elementsInTimeline.push(el);
-        });
-
-        const parsedData = parseToObject(
-          attributes.filter((attr) => !matchesTl(attr)).join(" "),
-          true,
-          element,
-        );
-
+        processedElements.push(...getTimeline(element));
         processedElements.push(element);
-        timelines.push({
-          id: timelineData?.id || Math.random().toString(36).substring(2, 15),
-          data: parsedData,
-          breakpoint: timelineData?.breakpoint || defaultBp,
-          elements: elementsInTimeline,
-          timeline: gsap.timeline(parsedData),
-        });
-
-        return;
       }
     });
 
     els.forEach((element) => {
       if (processedElements.includes(element)) return;
       const timelineMatchMedia = timelines.find(
-        (timeline) =>
-          timeline.elements.some((el) => el === element) && timeline.breakpoint,
+        (timeline) => timeline.elements?.has(element) && timeline.breakpoint,
       )?.breakpoint;
 
-      elements.push(
-        ...Object.entries(
-          parseMediaQueries(getAttribute(element), breakpoints, defaultBp),
-        ).map(([key, value]) => ({
-          breakpoint: key ?? timelineMatchMedia,
-          element,
-          data: parseToObject(value.join(" "), false, element),
-        })),
+      const timeline = timelines.find((timeline) =>
+        timeline.elements?.has(element),
       );
-    });
 
-    elements.forEach((element) => {
-      if (!animations.has(element.element)) {
-        animations.set(element.element, {});
+      const elements = new Map<Element, GlazeAnimationObject>();
+      if (!timeline) {
+        elements.set(element, getTimelineElement(element));
+        timelines.push({
+          breakpoint: timelineMatchMedia || defaultBp,
+          data: {},
+          elements,
+          id: getId(),
+          timeline: gsap.timeline(),
+        });
       }
-
-      const data = {
-        [element.breakpoint]: element.data,
-      };
-      animations.set(element.element, {
-        ...animations.get(element.element),
-        ...data,
-      });
     });
 
     console.log("breakpoints:", breakpoints);
     console.log("timelines:", timelines);
-    console.log("elements:", elements);
-    console.log("animations", animations);
   }
 
   function start() {
-    clear();
     collect();
 
     const mm: gsap.MatchMedia = gsap.matchMedia();
@@ -152,34 +190,22 @@ function glaze(config: GlazeConfig) {
     const applyAnimationSet = (
       element: Element,
       data: GlazeAnimationObject,
-      timeline?: gsap.core.Timeline,
+      timeline: gsap.core.Timeline,
     ) => {
       const tlValue = data.tl ? Object.values(data.tl)?.[0] : undefined;
 
       if (data.to && data.from) {
-        if (timeline) {
-          timeline.fromTo(
-            getSelectorOrElement(element, data),
-            data.from,
-            data.to,
-            tlValue,
-          );
-        } else {
-          gsap.fromTo(getSelectorOrElement(element, data), data.from, data.to);
-        }
+        timeline.fromTo(
+          getSelectorOrElement(element, data),
+          data.from,
+          data.to,
+          tlValue,
+        );
         return;
       }
       if (data.to || data.from) {
         const key = data.to ? "to" : "from";
-        if (timeline) {
-          timeline[key](
-            getSelectorOrElement(element, data),
-            data[key],
-            tlValue,
-          );
-        } else {
-          gsap[key](getSelectorOrElement(element, data), data[key]);
-        }
+        timeline[key](getSelectorOrElement(element, data), data[key], tlValue);
       }
     };
 
@@ -191,60 +217,38 @@ function glaze(config: GlazeConfig) {
         }).map((key) => [key, key]),
       ),
       (context) => {
-        animations.forEach((value, element) => {
-          let animationObject = {};
+        timelines
+          .reduce((acc, obj) => new Map([...acc, ...obj.elements]), new Map())
+          .forEach((value, element) => {
+            let animationObject = {};
 
-          Object.entries(value).forEach(([key, value]) => {
-            if (context.conditions?.[key]) {
-              animationObject = mergeDeep(animationObject, value);
-            }
+            Object.entries(value).forEach(([key, value]) => {
+              if (context.conditions?.[key]) {
+                animationObject = mergeDeep(
+                  animationObject,
+                  value as PlainObject,
+                );
+              }
+            });
+
+            let timeline = timelines.find(({ elements }) =>
+              elements.has(element),
+            )?.timeline;
+
+            if (!timeline) return;
+            applyAnimationSet(element, animationObject, timeline);
           });
-
-          const timeline = timelines.find(({ elements }) =>
-            elements.includes(element),
-          )?.timeline;
-
-          applyAnimationSet(element, animationObject, timeline);
-        });
       },
     );
   }
 
-  function clear() {
-    elements = [];
-    timelines = [];
-    animations = new Map();
-  }
-
-  function kill() {
-    timelines.forEach(({ timeline }) => {
-      timeline.kill();
-    });
-    animations.forEach((_value, element) => {
-      gsap.killTweensOf(element);
-    });
-    clear();
-  }
-
-  function restart() {
-    kill();
-    collect();
-    start();
-  }
-
   start();
+  if (state.watch) watch();
 
   return {
-    start,
-    kill,
-    restart,
-    data: {
-      state,
-      breakpoints,
-      elements,
-      timelines,
-      animations,
-    },
+    breakpoints,
+    state,
+    timelines,
   };
 }
 
