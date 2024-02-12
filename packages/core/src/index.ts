@@ -134,7 +134,6 @@ function glaze(config: GlazeConfig) {
         data: parsedData,
         elements,
         id: timelineData?.id || getId(),
-        timeline: gsap.timeline(parsedData),
       });
     }
 
@@ -173,7 +172,6 @@ function glaze(config: GlazeConfig) {
           data: {},
           elements,
           id: getId(),
-          timeline: gsap.timeline(),
         });
       }
     });
@@ -193,6 +191,8 @@ function glaze(config: GlazeConfig) {
       timeline: gsap.core.Timeline,
     ) => {
       const tlValue = data.tl ? Object.values(data.tl)?.[0] : undefined;
+
+      console.log(tlValue);
 
       if (data.to && data.from) {
         timeline.fromTo(
@@ -217,6 +217,10 @@ function glaze(config: GlazeConfig) {
         }).map((key) => [key, key]),
       ),
       (context) => {
+        const tl: {
+          [key: string]: gsap.core.Timeline;
+        } = {};
+
         timelines
           .reduce((acc, obj) => new Map([...acc, ...obj.elements]), new Map())
           .forEach((value, element) => {
@@ -231,12 +235,14 @@ function glaze(config: GlazeConfig) {
               }
             });
 
-            let timeline = timelines.find(({ elements }) =>
-              elements.has(element),
-            )?.timeline;
-
+            const timeline = timelines.find((t) => t.elements.has(element));
             if (!timeline) return;
-            applyAnimationSet(element, animationObject, timeline);
+
+            if (!tl?.[timeline?.id]) {
+              tl[timeline?.id] = gsap.timeline(timeline?.data);
+            }
+
+            applyAnimationSet(element, animationObject, tl[timeline?.id]);
           });
       },
     );

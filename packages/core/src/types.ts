@@ -34,7 +34,6 @@ type GlazeTimeline = {
   data: GlazeObjectSettings;
   elements: Map<Element, GlazeAnimationObject>;
   breakpoint: string;
-  timeline: typeof import("gsap").gsap.core.Timeline.prototype;
 };
 
 type PlainObject = { [key: string]: any };
