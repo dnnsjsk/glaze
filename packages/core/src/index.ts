@@ -48,7 +48,7 @@ function glaze(config: GlazeConfig) {
     (element.getAttribute(getAttributeString()) || "").trim();
 
   const getElements = (element: Document | Element = state.element) =>
-    element.querySelectorAll(getAttributeString(true));
+    Array.from(element.querySelectorAll(getAttributeString(true)));
 
   const getAttributeString = (withBrackets = false) =>
     `${withBrackets ? "[" : ""}${state.dataAttribute}${withBrackets ? "]" : ""}`;
@@ -58,6 +58,12 @@ function glaze(config: GlazeConfig) {
   const matchesTl = (attr: string) =>
     attr === "tl" || attr.includes("tl/") || attr.endsWith(":tl");
 
+  const findTimeline = (element: Element) =>
+    timelines.find((timeline) => timeline.elements.has(element));
+
+  const findTimelineIndex = (element: Element) =>
+    timelines.findIndex((timeline) => timeline.elements.has(element));
+
   function watch() {
     const target = state.element;
     const observer = new MutationObserver(function (mutations) {
@@ -66,7 +72,23 @@ function glaze(config: GlazeConfig) {
           mutation.type === "attributes" &&
           mutation.attributeName === state.dataAttribute
         ) {
-          console.log(mutation.target, "changed", mutation.attributeName);
+          const timeline = findTimeline(mutation.target as Element);
+          const index = findTimelineIndex(mutation.target as Element);
+
+          if (index > -1 && timeline?.timeline) {
+            timeline.timeline.progress(0);
+            timeline.timeline.kill();
+            timelines.splice(index, 1);
+            start(
+              [
+                ...Array.from(timeline.elements.keys()),
+                ...(timeline?.timelineElement
+                  ? [timeline?.timelineElement]
+                  : []),
+              ],
+              true,
+            );
+          }
         }
       });
     });
@@ -134,15 +156,15 @@ function glaze(config: GlazeConfig) {
         data: parsedData,
         elements,
         id: timelineData?.id || getId(),
+        timelineElement: element,
       });
     }
 
     return processedElements;
   }
 
-  function collect() {
+  function collect(els = getElements()) {
     const processedElements: Element[] = [];
-    const els = getElements();
 
     els.forEach((element) => {
       const data = getAttribute(element);
@@ -180,34 +202,32 @@ function glaze(config: GlazeConfig) {
     console.log("timelines:", timelines);
   }
 
-  function start() {
-    collect();
+  function applyAnimationSet(
+    element: Element,
+    data: GlazeAnimationObject,
+    timeline: gsap.core.Timeline,
+  ) {
+    const tlValue = data.tl ? Object.values(data.tl)?.[0] : undefined;
+
+    if (data.to && data.from) {
+      timeline.fromTo(
+        getSelectorOrElement(element, data),
+        data.from,
+        data.to,
+        tlValue,
+      );
+      return;
+    }
+    if (data.to || data.from) {
+      const key = data.to ? "to" : "from";
+      timeline[key](getSelectorOrElement(element, data), data[key], tlValue);
+    }
+  }
+
+  function start(els = getElements(), restartLast = false) {
+    collect(els);
 
     const mm: gsap.MatchMedia = gsap.matchMedia();
-
-    const applyAnimationSet = (
-      element: Element,
-      data: GlazeAnimationObject,
-      timeline: gsap.core.Timeline,
-    ) => {
-      const tlValue = data.tl ? Object.values(data.tl)?.[0] : undefined;
-
-      console.log(tlValue);
-
-      if (data.to && data.from) {
-        timeline.fromTo(
-          getSelectorOrElement(element, data),
-          data.from,
-          data.to,
-          tlValue,
-        );
-        return;
-      }
-      if (data.to || data.from) {
-        const key = data.to ? "to" : "from";
-        timeline[key](getSelectorOrElement(element, data), data[key], tlValue);
-      }
-    };
 
     mm.add(
       Object.fromEntries(
@@ -221,7 +241,7 @@ function glaze(config: GlazeConfig) {
           [key: string]: gsap.core.Timeline;
         } = {};
 
-        timelines
+        (restartLast ? [timelines[timelines.length - 1]] : timelines)
           .reduce((acc, obj) => new Map([...acc, ...obj.elements]), new Map())
           .forEach((value, element) => {
             let animationObject = {};
@@ -235,11 +255,13 @@ function glaze(config: GlazeConfig) {
               }
             });
 
-            const timeline = timelines.find((t) => t.elements.has(element));
+            const timeline = findTimeline(element);
+            const timelineIndex = findTimelineIndex(element);
             if (!timeline) return;
 
             if (!tl?.[timeline?.id]) {
               tl[timeline?.id] = gsap.timeline(timeline?.data);
+              timelines[timelineIndex].timeline = tl[timeline?.id];
             }
 
             applyAnimationSet(element, animationObject, tl[timeline?.id]);

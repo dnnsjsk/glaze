@@ -4,7 +4,7 @@ import glaze from "./src";
 
 gsap.registerPlugin(ScrollTrigger);
 
-glaze({
+const { timelines } = glaze({
   breakpoints: {
     lg: "(min-width: 1024px)",
   },
@@ -13,3 +13,14 @@ glaze({
   },
   watch: true,
 });
+
+setTimeout(() => {
+  const tl = timelines[0];
+
+  for (const [element] of tl.elements) {
+    if (!element) continue;
+    const animateObject = element.getAttribute("data-animate");
+    if (!animateObject) continue;
+    element.setAttribute("data-animate", animateObject.replace("red", "pink"));
+  }
+}, 5000);

@@ -30,10 +30,12 @@ type GlazeObjectSettings = {
 };
 
 type GlazeTimeline = {
-  id: string;
+  breakpoint: string;
   data: GlazeObjectSettings;
   elements: Map<Element, GlazeAnimationObject>;
-  breakpoint: string;
+  id: string;
+  timeline?: gsap.core.Timeline;
+  timelineElement?: Element;
 };
 
 type PlainObject = { [key: string]: any };
