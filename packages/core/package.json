@@ -26,7 +26,7 @@
     "gsap"
   ],
   "scripts": {
-    "build": "vitest --watch=false && tsc && vite build && node scripts/postbuild.js",
+    "build": "pnpm run test:unit && tsc && vite build && node scripts/postbuild.js",
     "dev": "vite",
     "release": "npm run build && npm publish",
     "test": "npm run test:unit && npm run test:e2e",
