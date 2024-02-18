@@ -22,7 +22,11 @@ type GlazeConfig = {
       core: typeof import("gsap").gsap;
     };
   };
-  watch?: boolean;
+  watch?:
+    | boolean
+    | {
+        debounceTime?: number;
+      };
 };
 
 type GlazeObjectSettings = {

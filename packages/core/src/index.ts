@@ -10,6 +10,7 @@ import mergeDeep from "@/utils/mergeDeep.ts";
 import parseToObject from "@/utils/parseToObject.ts";
 import parseTimeline from "@/utils/parseTimeline.ts";
 import parseMediaQueries from "@/utils/parseMediaQueries.ts";
+import debounce from "@/utils/debounce.ts";
 
 function glaze(config: GlazeConfig) {
   if (!config || !config?.lib?.gsap?.core) {
@@ -64,6 +65,29 @@ function glaze(config: GlazeConfig) {
   const findTimelineIndex = (element: Element) =>
     timelines.findIndex((timeline) => timeline.elements.has(element));
 
+  const debouncedHandleMutation = debounce(
+    handleMutation,
+    typeof state.watch === "object" ? state.watch.debounceTime || 5000 : 500,
+  );
+
+  function handleMutation(mutation: MutationRecord) {
+    const timeline = findTimeline(mutation.target as Element);
+    const index = findTimelineIndex(mutation.target as Element);
+
+    if (index > -1 && timeline?.timeline) {
+      timeline.timeline.progress(0);
+      timeline.timeline.kill();
+      timelines.splice(index, 1);
+      start(
+        [
+          ...Array.from(timeline.elements.keys()),
+          ...(timeline?.timelineElement ? [timeline?.timelineElement] : []),
+        ],
+        true,
+      );
+    }
+  }
+
   function watch() {
     const target = state.element;
     const observer = new MutationObserver(function (mutations) {
@@ -72,23 +96,7 @@ function glaze(config: GlazeConfig) {
           mutation.type === "attributes" &&
           mutation.attributeName === state.dataAttribute
         ) {
-          const timeline = findTimeline(mutation.target as Element);
-          const index = findTimelineIndex(mutation.target as Element);
-
-          if (index > -1 && timeline?.timeline) {
-            timeline.timeline.progress(0);
-            timeline.timeline.kill();
-            timelines.splice(index, 1);
-            start(
-              [
-                ...Array.from(timeline.elements.keys()),
-                ...(timeline?.timelineElement
-                  ? [timeline?.timelineElement]
-                  : []),
-              ],
-              true,
-            );
-          }
+          debouncedHandleMutation(mutation);
         }
       });
     });
