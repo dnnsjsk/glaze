@@ -7,12 +7,12 @@
     <title>Glaze dev</title>
     <style>
       body,
-      div:has(div[data-animate]), div:has(.stagger) {
+      .group {
         display: flex;
         flex-direction: column;
         gap: 8px;
       }
-      div[data-animate]:not(div[data-animate]:has(div[data-animate])):not(:has(.stagger)), .stagger {
+      .box {
         width: 40px;
         height: 40px;
         border-radius: 4px;
@@ -22,17 +22,17 @@
     </style>
   </head>
   <body class="overflow-x-hidden">
-    <div data-animate="tl/main defaults:duration-3|ease-power2.inOut">
-      <div class="tl-main" data-animate="to:x-500|background-red"></div>
-      <div class="tl-main" data-animate="tl:[-=2] to:x-500|background-red"></div>
+    <div class="group glaze-tl/main" data-animate="defaults:duration-3|ease-power2.inOut">
+      <div class="box tl-main glaze-to:x-500|background-red"></div>
+      <div class="box tl-main" data-animate="tl:[-=2] to:x-500|background-red"></div>
     </div>
-    <div class="tl-main" data-animate="tl:main to:x-500|background-red"></div>
-    <div data-animate="tl defaults:duration-3|ease-power2.inOut">
-      <div class="tl-two" data-animate="to:x-500|background-blue"></div>
-      <div class="tl-two" data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
+    <div class="box tl-main" data-animate="tl:main to:x-500|background-red"></div>
+    <div class="group" data-animate="tl defaults:duration-3|ease-power2.inOut">
+      <div class="box tl-two" data-animate="to:x-500|background-blue"></div>
+      <div class="box tl-two" data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
     </div>
     <div
-      class="tl-three"
+      class="box tl-three"
       data-animate="to:duration-2|x-500|background-green|ease-power2.inOut"
     ></div>
     <div
@@ -40,14 +40,15 @@
       data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
     ></div>
     <div
-      class="tl-five"
+      class="box tl-five"
       data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
     ></div>
-    <div class="tl-main" data-animate="tl:main-[-=2] to:x-500|background-red"></div>
-    <div class="tl-six" data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
-      <div class="stagger"></div>
-      <div class="stagger"></div>
-      <div class="stagger"></div>
+    <div class="box tl-main" data-animate="tl:main-[-=2] to:x-500|background-red"></div>
+    <div class="box tl-main glaze-tl:main-[-=2]" data-animate="to:x-500|background-red"></div>
+    <div class="group tl-six" data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
     </div>
     <script type="module" src="index.ts"></script>
   </body>

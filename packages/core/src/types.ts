@@ -16,6 +16,7 @@ type GlazeConfig = {
     [key: string]: string | undefined;
   };
   dataAttribute?: string;
+  className?: string;
   element?: Document | Element;
   lib: {
     gsap: {

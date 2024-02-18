@@ -45,14 +45,35 @@ function glaze(config: GlazeConfig) {
   const breakpoints = state.breakpoints;
   const timelines: GlazeTimeline[] = [];
 
-  const getAttribute = (element: Element) =>
-    (element.getAttribute(getAttributeString()) || "").trim();
-
-  const getElements = (element: Document | Element = state.element) =>
-    Array.from(element.querySelectorAll(getAttributeString(true)));
-
   const getAttributeString = (withBrackets = false) =>
     `${withBrackets ? "[" : ""}${state.dataAttribute}${withBrackets ? "]" : ""}`;
+
+  const getClassnameString = () =>
+    state.className
+      ? `, [class^="${state.className}"], [class*="${state.className}"]`
+      : "";
+
+  const getAttribute = (element: Element) => {
+    const attribute = element.getAttribute(getAttributeString()) || "";
+    let classes = "";
+    if (state?.className) {
+      const className = element.getAttribute("class") || "";
+      const classNameArray = className.split(" ");
+      classes = classNameArray
+        .filter((c) => c.includes(<string>state.className))
+        .map((c) => c.replace(`${state?.className}-`, ""))
+        .join(" ");
+    }
+
+    return `${attribute} ${classes}`.trim();
+  };
+
+  const getElements = (element: Document | Element = state.element) =>
+    Array.from(
+      element.querySelectorAll(
+        `${getAttributeString(true)}${getClassnameString()}`,
+      ),
+    );
 
   const getId = () => Math.random().toString(36).substring(2, 15);
 
@@ -67,7 +88,7 @@ function glaze(config: GlazeConfig) {
 
   const debouncedHandleMutation = debounce(
     handleMutation,
-    typeof state.watch === "object" ? state.watch.debounceTime || 5000 : 500,
+    typeof state.watch === "object" ? state.watch.debounceTime || 500 : 500,
   );
 
   function handleMutation(mutation: MutationRecord) {
@@ -144,10 +165,12 @@ function glaze(config: GlazeConfig) {
         ...getElements(element),
         ...(timelineData?.id
           ? document.querySelectorAll(
-              `[${state.dataAttribute}*="tl:${timelineData.id}"]`,
+              `[${state.dataAttribute}*="tl:${timelineData.id}"]${getClassnameString()}`,
             )
           : []),
       ].forEach((el) => {
+        if (el === element) return;
+
         elements.set(el, getTimelineElement(el));
         processedElements.push(el);
       });

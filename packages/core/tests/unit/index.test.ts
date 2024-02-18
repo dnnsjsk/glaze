@@ -39,29 +39,33 @@ describe("glaze", () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="test-container">
-        <div data-animate="tl/main defaults:duration-3|ease-power2.inOut">
-          <div data-animate="to:x-500|background-red"></div>
-          <div data-animate="tl:[-=2] to:x-500|background-red"></div>
+        <div class="group glaze-tl/main" data-animate="defaults:duration-3|ease-power2.inOut">
+          <div class="box tl-main glaze-to:x-500|background-red"></div>
+          <div class="box tl-main" data-animate="tl:[-=2] to:x-500|background-red"></div>
         </div>
-        <div data-animate="tl:main to:x-500|background-red"></div>
-        <div data-animate="tl defaults:duration-3|ease-power2.inOut">
-          <div data-animate="to:x-500|background-blue"></div>
-          <div data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
+        <div class="box tl-main" data-animate="tl:main to:x-500|background-red"></div>
+        <div class="group" data-animate="tl defaults:duration-3|ease-power2.inOut">
+          <div class="box tl-two" data-animate="to:x-500|background-blue"></div>
+          <div class="box tl-two" data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
         </div>
         <div
+          class="box tl-three"
           data-animate="to:duration-2|x-500|background-green|ease-power2.inOut"
         ></div>
         <div
+          class="tl-four"
           data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
         ></div>
         <div
+          class="box tl-five"
           data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
         ></div>
-        <div data-animate="tl:main-[-=2] to:x-500|background-red"></div>
-        <div data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
-          <div class="stagger"></div>
-          <div class="stagger"></div>
-          <div class="stagger"></div>
+        <div class="box tl-main" data-animate="tl:main-[-=2] to:x-500|background-red"></div>
+        <div class="box tl-main glaze-tl:main-[-=2]" data-animate="to:x-500|background-red"></div>
+        <div class="group tl-six" data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
         </div>
       </div>
     `;
@@ -73,6 +77,7 @@ describe("glaze", () => {
         lg: "(min-width: 1024px)",
       },
       element: container,
+      className: "glaze",
     });
   });
 
@@ -102,11 +107,12 @@ describe("glaze", () => {
       glazeInstance.timelines
         .map((tl) => Array.from(tl.elements.keys()))
         .flat(),
-    ).toHaveLength(10);
+    ).toHaveLength(11);
   });
 
   it("returns correct main timeline", () => {
     const tl = glazeInstance.timelines.find((tl) => tl.id === "main");
+    console.log(tl);
     if (!tl) throw new Error("Timeline not found");
 
     const elements = Array.from(tl.elements.keys());
@@ -119,7 +125,7 @@ describe("glaze", () => {
         ease: "power2.inOut",
       },
     });
-    expect(elements).toHaveLength(4);
+    expect(elements).toHaveLength(5);
     expect(values[0]).toStrictEqual({
       "(min-width: 640px)": {
         to: {
@@ -156,6 +162,17 @@ describe("glaze", () => {
         to: {
           x: 500,
           background: "red",
+        },
+      },
+    });
+    expect(values[4]).toStrictEqual({
+      "(min-width: 640px)": {
+        to: {
+          x: 500,
+          background: "red",
+        },
+        tl: {
+          main: "-=2",
         },
       },
     });
