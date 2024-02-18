@@ -39,8 +39,8 @@ describe("glaze", () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="test-container">
-        <div class="group glaze-tl/main" data-animate="defaults:duration-3|ease-power2.inOut">
-          <div class="box tl-main glaze-to:x-500|background-red"></div>
+        <div class="group animate-tl/main" data-animate="defaults:duration-3|ease-power2.inOut">
+          <div class="box tl-main animate-to:x-500|background-red"></div>
           <div class="box tl-main" data-animate="tl:[-=2] to:x-500|background-red"></div>
         </div>
         <div class="box tl-main" data-animate="tl:main to:x-500|background-red"></div>
@@ -49,8 +49,7 @@ describe("glaze", () => {
           <div class="box tl-two" data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
         </div>
         <div
-          class="box tl-three"
-          data-animate="to:duration-2|x-500|background-green|ease-power2.inOut"
+          class="box tl-three animate-to:duration-2|x-500|background-green|ease-power2.inOut"
         ></div>
         <div
           class="tl-four"
@@ -61,7 +60,7 @@ describe("glaze", () => {
           data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
         ></div>
         <div class="box tl-main" data-animate="tl:main-[-=2] to:x-500|background-red"></div>
-        <div class="box tl-main glaze-tl:main-[-=2]" data-animate="to:x-500|background-red"></div>
+        <div class="box tl-main animate-tl:main-[-=2]" data-animate="to:x-500|background-red"></div>
         <div class="group tl-six" data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
           <div class="box"></div>
           <div class="box"></div>
@@ -77,7 +76,7 @@ describe("glaze", () => {
         lg: "(min-width: 1024px)",
       },
       element: container,
-      className: "glaze",
+      className: "animate",
     });
   });
 

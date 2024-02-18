@@ -12,7 +12,7 @@ const { timelines } = glaze({
   lib: {
     gsap: { core: gsap },
   },
-  className: "glaze",
+  className: "animate",
   watch: true,
 });
 

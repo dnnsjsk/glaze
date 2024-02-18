@@ -114,8 +114,9 @@ function glaze(config: GlazeConfig) {
     const observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         if (
-          mutation.type === "attributes" &&
-          mutation.attributeName === state.dataAttribute
+          (mutation.type === "attributes" &&
+            mutation.attributeName === state.dataAttribute) ||
+          (state.className && mutation.attributeName === "class")
         ) {
           debouncedHandleMutation(mutation);
         }
@@ -124,7 +125,10 @@ function glaze(config: GlazeConfig) {
 
     const mutationConfig = {
       attributes: true,
-      attributeFilter: [state.dataAttribute],
+      attributeFilter: [
+        state.dataAttribute,
+        ...(state.className ? ["class"] : []),
+      ],
       subtree: true,
     };
 
@@ -165,7 +169,11 @@ function glaze(config: GlazeConfig) {
         ...getElements(element),
         ...(timelineData?.id
           ? document.querySelectorAll(
-              `[${state.dataAttribute}*="tl:${timelineData.id}"]${getClassnameString()}`,
+              `[${state.dataAttribute}*="tl:${timelineData.id}"]${
+                state.className
+                  ? `, [class^="${state.className}-tl:${timelineData.id}"], [class*="${state.className}-tl:${timelineData.id}"]`
+                  : ""
+              }`,
             )
           : []),
       ].forEach((el) => {
