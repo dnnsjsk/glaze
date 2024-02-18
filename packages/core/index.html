@@ -23,25 +23,28 @@
   </head>
   <body class="overflow-x-hidden">
     <div data-animate="tl/main defaults:duration-3|ease-power2.inOut">
-      <div data-animate="to:x-500|background-red"></div>
-      <div data-animate="tl:[-=2] to:x-500|background-red"></div>
+      <div class="tl-main" data-animate="to:x-500|background-red"></div>
+      <div class="tl-main" data-animate="tl:[-=2] to:x-500|background-red"></div>
     </div>
-    <div data-animate="tl:main to:x-500|background-red"></div>
+    <div class="tl-main" data-animate="tl:main to:x-500|background-red"></div>
     <div data-animate="tl defaults:duration-3|ease-power2.inOut">
-      <div data-animate="to:x-500|background-blue"></div>
-      <div data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
+      <div class="tl-two" data-animate="to:x-500|background-blue"></div>
+      <div class="tl-two" data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
     </div>
     <div
+      class="tl-three"
       data-animate="to:duration-2|x-500|background-green|ease-power2.inOut"
     ></div>
     <div
+      class="tl-four"
       data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
     ></div>
     <div
+      class="tl-five"
       data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
     ></div>
-    <div data-animate="tl:main-[-=2] to:x-500|background-red"></div>
-    <div data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
+    <div class="tl-main" data-animate="tl:main-[-=2] to:x-500|background-red"></div>
+    <div class="tl-six" data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
       <div class="stagger"></div>
       <div class="stagger"></div>
       <div class="stagger"></div>

@@ -50,8 +50,4 @@ export default defineConfig({
       include: ["./src/index.ts"],
     }),
   ],
-  test: {
-    globals: true,
-    environment: "jsdom",
-  },
 });

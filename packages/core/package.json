@@ -26,12 +26,16 @@
     "gsap"
   ],
   "scripts": {
-    "dev": "vite",
-    "test": "vitest",
     "build": "vitest --watch=false && tsc && vite build && node scripts/postbuild.js",
-    "release": "npm run build && npm publish"
+    "dev": "vite",
+    "release": "npm run build && npm publish",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:e2e": "npx playwright test",
+    "test:unit": "vitest --watch=false --config vitest.config.unit.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
+    "@types/node": "18.19.14",
     "gsap": "^3.12.5",
     "jsdom": "^24.0.0",
     "prettier": "^3.2.5",

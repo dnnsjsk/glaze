@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import getSelectorFromBracket from "../../src/utils/getSelectorFromBracket";
+import getSelectorFromBracket from "../../../src/utils/getSelectorFromBracket";
 
 describe("getSelectorFromBracket", () => {
   it("extracts content and restOfString for matching inputs", () => {

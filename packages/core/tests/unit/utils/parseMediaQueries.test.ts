@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import parseMediaQueries from "../../src/utils/parseMediaQueries";
+import parseMediaQueries from "../../../src/utils/parseMediaQueries";
 
 describe("parseMediaQueries", () => {
   const breakpoints = {
