@@ -6,6 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const { timelines } = glaze({
   breakpoints: {
+    default: "(min-width: 640px)",
     lg: "(min-width: 1024px)",
   },
   lib: {

@@ -7,12 +7,12 @@
     <title>Glaze dev</title>
     <style>
       body,
-      div:has(div[data-animate]) {
+      div:has(div[data-animate]), div:has(.stagger) {
         display: flex;
         flex-direction: column;
         gap: 8px;
       }
-      div[data-animate]:not(div[data-animate]:has(div[data-animate])) {
+      div[data-animate]:not(div[data-animate]:has(div[data-animate])):not(:has(.stagger)), .stagger {
         width: 40px;
         height: 40px;
         border-radius: 4px;
@@ -41,6 +41,11 @@
       data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
     ></div>
     <div data-animate="tl:main-[-=2] to:x-500|background-red"></div>
+    <div data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
+      <div class="stagger"></div>
+      <div class="stagger"></div>
+      <div class="stagger"></div>
+    </div>
     <script type="module" src="index.ts"></script>
   </body>
 </html>

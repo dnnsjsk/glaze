@@ -39,23 +39,29 @@ describe("glaze", () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="test-container">
-        <div data-animate="tl/main defaults:ease-linear yoyo-true">
-          <div data-animate="from:opacity-0 @md:from:opacity-0.25 @md:from:opacity-0.5"></div>
-          <div data-animate="from:opacity-0"></div>
+        <div data-animate="tl/main defaults:duration-3|ease-power2.inOut">
+          <div data-animate="to:x-500|background-red"></div>
+          <div data-animate="tl:[-=2] to:x-500|background-red"></div>
         </div>
-        <div data-animate="tl:main-[-=3]"></div>
-        <div data-animate="@md:tl/md">
-          <div data-animate="from:opacity-0"></div>
-          <div data-animate="from:opacity-0"></div>
+        <div data-animate="tl:main to:x-500|background-red"></div>
+        <div data-animate="tl defaults:duration-3|ease-power2.inOut">
+          <div data-animate="to:x-500|background-blue"></div>
+          <div data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
         </div>
-        <div data-animate="tl:md-[-=3] from:opacity-0"></div>
-        <div data-animate="@lg:tl">
-          <div data-animate="from:opacity-0"></div>
-          <div data-animate="from:opacity-0 to:opacity-10"></div>
-        </div>
-        <div data-animate="@lg:[&>div]:from:opacity-0|x-50">
-          <div></div>
-          <div></div>
+        <div
+          data-animate="to:duration-2|x-500|background-green|ease-power2.inOut"
+        ></div>
+        <div
+          data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
+        ></div>
+        <div
+          data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
+        ></div>
+        <div data-animate="tl:main-[-=2] to:x-500|background-red"></div>
+        <div data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
+          <div class="stagger"></div>
+          <div class="stagger"></div>
+          <div class="stagger"></div>
         </div>
       </div>
     `;
@@ -64,7 +70,6 @@ describe("glaze", () => {
       lib: { gsap: { core: gsap } },
       breakpoints: {
         default: "(min-width: 640px)",
-        md: "(min-width: 768px)",
         lg: "(min-width: 1024px)",
       },
       element: container,
@@ -77,107 +82,220 @@ describe("glaze", () => {
   });
 
   it("returns correct base element", () => {
-    expect(glazeInstance.data.state.element).toBe(container);
+    expect(glazeInstance.state.element).toBe(container);
   });
 
   it("returns correct default breakpoint", () => {
-    expect(glazeInstance.data.breakpoints.default).toEqual(
-      "(min-width: 640px)",
-    );
+    expect(glazeInstance.breakpoints.default).toEqual("(min-width: 640px)");
   });
 
   it("returns correct breakpoints", () => {
     const result = {
       default: "(min-width: 640px)",
-      md: "(min-width: 768px)",
       lg: "(min-width: 1024px)",
     };
-    expect(glazeInstance.data.breakpoints).toEqual(result);
+    expect(glazeInstance.breakpoints).toEqual(result);
   });
 
   it("returns correct elements", () => {
-    expect(glazeInstance.data.elements).toHaveLength(10);
+    expect(
+      glazeInstance.timelines
+        .map((tl) => Array.from(tl.elements.keys()))
+        .flat(),
+    ).toHaveLength(10);
   });
 
   it("returns correct main timeline", () => {
-    const result = {
-      id: "main",
-      data: {
-        defaults: {
-          ease: "linear",
-        },
-        yoyo: true,
+    const tl = glazeInstance.timelines.find((tl) => tl.id === "main");
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(tl.id).toBe("main");
+    expect(tl.data).toEqual({
+      defaults: {
+        duration: 3,
+        ease: "power2.inOut",
       },
-      // @ts-ignore
-      elements: expect.toBeArrayOfSize(3),
-      breakpoint: "(min-width: 640px)",
-      timeline: undefined,
-    };
-    expect(glazeInstance.data.timelines[0]).toStrictEqual(result);
-  });
-
-  it("returns correct md timeline", () => {
-    const result = {
-      id: "md",
-      data: {},
-      // @ts-ignore
-      elements: expect.toBeArrayOfSize(3),
-      breakpoint: "(min-width: 768px)",
-      timeline: undefined,
-    };
-    expect(glazeInstance.data.timelines[1]).toStrictEqual(result);
-  });
-
-  it("returns correct lg timeline", () => {
-    const result = {
-      id: expect.any(String),
-      data: {},
-      // @ts-ignore
-      elements: expect.toBeArrayOfSize(2),
-      breakpoint: "(min-width: 1024px)",
-      timeline: undefined,
-    };
-    expect(glazeInstance.data.timelines[2]).toStrictEqual(result);
-  });
-
-  it("returns correct animations", () => {
-    expect(glazeInstance.data.animations).toHaveLength(9);
-  });
-
-  it("second last animation returns correct animation object", () => {
-    const result = {
-      breakpoint: "(min-width: 640px)",
-      data: {
-        from: {
-          opacity: 0,
+    });
+    expect(elements).toHaveLength(4);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 640px)": {
+        to: {
+          x: 500,
+          background: "red",
+        },
+      },
+    });
+    expect(values[1]).toStrictEqual({
+      "(min-width: 640px)": {
+        tl: {
+          value: "-=2",
         },
         to: {
-          opacity: 10,
+          x: 500,
+          background: "red",
         },
       },
-      element: expect.any(HTMLElement),
-    };
-    expect(
-      glazeInstance.data.elements[glazeInstance.data.elements.length - 2],
-    ).toStrictEqual(result);
+    });
+    expect(values[2]).toStrictEqual({
+      "(min-width: 640px)": {
+        tl: { main: undefined },
+        to: {
+          x: 500,
+          background: "red",
+        },
+      },
+    });
+    expect(values[3]).toStrictEqual({
+      "(min-width: 640px)": {
+        tl: {
+          main: "-=2",
+        },
+        to: {
+          x: 500,
+          background: "red",
+        },
+      },
+    });
   });
 
-  it("last animation returns correct animation object", () => {
-    const result = {
-      breakpoint: "(min-width: 1024px)",
-      data: {
-        from: {
-          opacity: 0,
-          x: 50,
+  it("returns correct second timeline", () => {
+    const tl = glazeInstance.timelines[1];
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(tl.data).toStrictEqual({
+      defaults: {
+        duration: 3,
+        ease: "power2.inOut",
+      },
+    });
+    expect(elements).toHaveLength(2);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 640px)": {
+        to: {
+          x: 500,
+          background: "blue",
         },
+      },
+    });
+    expect(values[1]).toStrictEqual({
+      "(min-width: 640px)": {
+        tl: {
+          value: "-=2",
+        },
+        to: {
+          x: 500,
+          background: "blue",
+        },
+      },
+      "(min-width: 1024px)": {
+        to: {
+          background: "navy",
+        },
+      },
+    });
+  });
+
+  it("returns correct third timeline", () => {
+    const tl = glazeInstance.timelines[2];
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(tl.data).toStrictEqual({});
+    expect(elements).toHaveLength(1);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 640px)": {
+        to: {
+          duration: 2,
+          x: 500,
+          background: "green",
+          ease: "power2.inOut",
+        },
+      },
+    });
+  });
+
+  it("returns correct fourth timeline", () => {
+    const tl = glazeInstance.timelines[3];
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(tl.data).toStrictEqual({});
+    expect(elements).toHaveLength(1);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 640px)": {
+        to: {
+          duration: 3,
+          x: 500,
+          background: "yellow",
+          ease: "power2.inOut",
+        },
+      },
+      "(min-width: 1024px)": {
+        to: {
+          background: "purple",
+        },
+      },
+    });
+  });
+
+  it("returns correct fifth timeline", () => {
+    const tl = glazeInstance.timelines[4];
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(tl.data).toStrictEqual({});
+    expect(elements).toHaveLength(1);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 640px)": {
+        to: {
+          duration: 3,
+          x: 500,
+          background: "yellow",
+          ease: "power2.inOut",
+        },
+      },
+      "(min-width: 1024px)": {
+        to: {
+          background: "purple",
+        },
+      },
+    });
+  });
+
+  it("returns correct sixth timeline", () => {
+    const tl = glazeInstance.timelines[5];
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(tl.data).toStrictEqual({});
+    expect(elements).toHaveLength(1);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 1024px)": {
         selector: {
           value: "&>div",
         },
+        to: {
+          x: 500,
+          background: "yellow",
+          duration: 3,
+          stagger: 1.5,
+          ease: "power2.inOut",
+        },
       },
-      element: expect.any(HTMLElement),
-    };
-    expect(
-      glazeInstance.data.elements[glazeInstance.data.elements.length - 1],
-    ).toStrictEqual(result);
+    });
   });
 });
