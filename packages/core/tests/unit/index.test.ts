@@ -61,7 +61,7 @@ describe("glaze", () => {
         ></div>
         <div class="box tl-main" data-animate="tl:main-[-=2] to:x-500|background-red"></div>
         <div class="box tl-main animate-tl:main-[-=2]" data-animate="to:x-500|background-red"></div>
-        <div class="group tl-six" data-animate="@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
+        <div class="group tl-six animate-@lg:[&>div]:to:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
           <div class="box"></div>
           <div class="box"></div>
           <div class="box"></div>

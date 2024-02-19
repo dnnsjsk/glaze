@@ -91,35 +91,67 @@ function glaze(config: GlazeConfig) {
     typeof state.watch === "object" ? state.watch.debounceTime || 500 : 500,
   );
 
-  function handleMutation(mutation: MutationRecord) {
+  function handleMutation(
+    mutation: MutationRecord,
+    data: GlazeAnimationObject,
+  ) {
     const timeline = findTimeline(mutation.target as Element);
     const index = findTimelineIndex(mutation.target as Element);
 
     if (index > -1 && timeline?.timeline) {
-      timeline.timeline.progress(0);
-      timeline.timeline.kill();
+      timeline.timeline.progress(0).kill();
       timelines.splice(index, 1);
-      start(
-        [
-          ...Array.from(timeline.elements.keys()),
-          ...(timeline?.timelineElement ? [timeline?.timelineElement] : []),
-        ],
-        true,
-      );
+      Object.values(data).forEach((timeline) => {
+        Object.entries(timeline).forEach(([key]) => {
+          if (key === "selector") {
+            const elements = [
+              ...getSelectorOrElement(mutation.target as Element, timeline),
+              mutation.target as Element,
+            ];
+            gsap.killTweensOf(elements);
+            gsap.set(elements, {
+              clearProps: "all",
+            });
+          }
+        });
+      });
     }
+
+    start(
+      timeline?.timeline
+        ? [
+            ...Array.from(timeline.elements.keys()),
+            ...(timeline?.timelineElement ? [timeline?.timelineElement] : []),
+          ]
+        : [mutation.target as Element],
+      true,
+    );
   }
 
   function watch() {
     const target = state.element;
     const observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
-        if (
-          (mutation.type === "attributes" &&
-            mutation.attributeName === state.dataAttribute) ||
-          (state.className && mutation.attributeName === "class")
-        ) {
-          debouncedHandleMutation(mutation);
-        }
+        const isAttribute =
+          mutation.type === "attributes" &&
+          mutation.attributeName === state.dataAttribute;
+        const isClass =
+          state.className &&
+          mutation.attributeName === "class" &&
+          (mutation.target as Element)
+            .getAttribute("class")
+            ?.includes(state.className);
+
+        if (!isAttribute && !isClass) return;
+        const newData = getTimelineElement(mutation.target as Element);
+        const oldData = timelines
+          .find((timeline) => {
+            return timeline.elements.has(mutation.target as Element);
+          })
+          ?.elements.get(mutation.target as Element);
+        if (JSON.stringify(newData) === JSON.stringify(oldData)) return;
+
+        debouncedHandleMutation(mutation, newData);
       });
     });
 
