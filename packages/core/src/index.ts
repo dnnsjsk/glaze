@@ -41,7 +41,7 @@ function glaze(config: GlazeConfig) {
     };
   };
 
-  const defaultBp = state.breakpoints.default;
+  const defaultBp = state.breakpoints?.default;
   const breakpoints = state.breakpoints;
   const timelines: GlazeTimeline[] = [];
 
@@ -83,48 +83,33 @@ function glaze(config: GlazeConfig) {
   const findTimeline = (element: Element) =>
     timelines.find((timeline) => timeline.elements.has(element));
 
-  const findTimelineIndex = (element: Element) =>
-    timelines.findIndex((timeline) => timeline.elements.has(element));
+  const addOrReplaceTimeline = (timeline: GlazeTimeline, id = "") => {
+    if (id) {
+      const index = timelines.findIndex((timeline) => timeline.id === id);
+      if (index === -1) return;
+      timelines[index] = timeline;
+      return;
+    } else {
+      timelines.push(timeline);
+    }
+  };
 
   const debouncedHandleMutation = debounce(
     handleMutation,
     typeof state.watch === "object" ? state.watch.debounceTime || 500 : 500,
   );
 
-  function handleMutation(
-    mutation: MutationRecord,
-    data: GlazeAnimationObject,
-  ) {
+  function handleMutation(mutation: MutationRecord) {
     const timeline = findTimeline(mutation.target as Element);
-    const index = findTimelineIndex(mutation.target as Element);
 
-    if (index > -1 && timeline?.timeline) {
-      timeline.timeline.progress(0).kill();
-      timelines.splice(index, 1);
-      Object.values(data).forEach((timeline) => {
-        Object.entries(timeline).forEach(([key]) => {
-          if (key === "selector") {
-            const elements = [
-              ...getSelectorOrElement(mutation.target as Element, timeline),
-              mutation.target as Element,
-            ];
-            gsap.killTweensOf(elements);
-            gsap.set(elements, {
-              clearProps: "all",
-            });
-          }
-        });
-      });
-    }
-
+    if (!timeline?.timeline) return;
+    timeline.timeline.progress(0).clear();
     start(
-      timeline?.timeline
-        ? [
-            ...Array.from(timeline.elements.keys()),
-            ...(timeline?.timelineElement ? [timeline?.timelineElement] : []),
-          ]
-        : [mutation.target as Element],
-      true,
+      [
+        ...Array.from(timeline.elements.keys()),
+        ...(timeline?.timelineElement ? [timeline?.timelineElement] : []),
+      ],
+      timeline?.id || "",
     );
   }
 
@@ -150,8 +135,9 @@ function glaze(config: GlazeConfig) {
           })
           ?.elements.get(mutation.target as Element);
         if (JSON.stringify(newData) === JSON.stringify(oldData)) return;
+        if (!oldData || !newData) return;
 
-        debouncedHandleMutation(mutation, newData);
+        debouncedHandleMutation(mutation);
       });
     });
 
@@ -189,7 +175,7 @@ function glaze(config: GlazeConfig) {
     return bps;
   }
 
-  function getTimeline(element: Element) {
+  function getTimeline(element: Element, id = "") {
     const processedElements: Element[] = [];
     const data = getAttribute(element);
     const attributes = data.split(" ");
@@ -222,19 +208,23 @@ function glaze(config: GlazeConfig) {
       );
 
       const timelineBp = timelineData?.breakpoint || defaultBp;
-      timelines.push({
-        breakpoint: timelineBp,
-        data: parsedData,
-        elements,
-        id: timelineData?.id || getId(),
-        timelineElement: element,
-      });
+      addOrReplaceTimeline(
+        {
+          breakpoint: timelineBp,
+          data: parsedData,
+          elements,
+          id: timelineData?.id || getId(),
+          timelineElement: element,
+          timeline: gsap.timeline({ ...parsedData, paused: true }),
+        },
+        id,
+      );
     }
 
     return processedElements;
   }
 
-  function collect(els = getElements()) {
+  function collect(els = getElements(), id = "") {
     const processedElements: Element[] = [];
 
     els.forEach((element) => {
@@ -258,14 +248,19 @@ function glaze(config: GlazeConfig) {
       );
 
       const elements = new Map<Element, GlazeAnimationObject>();
-      if (!timeline) {
+      if (!timeline || id !== "") {
         elements.set(element, getTimelineElement(element));
-        timelines.push({
-          breakpoint: timelineMatchMedia || defaultBp,
-          data: {},
-          elements,
-          id: getId(),
-        });
+        addOrReplaceTimeline(
+          {
+            breakpoint: timelineMatchMedia || defaultBp,
+            data: {},
+            elements,
+            id: timeline?.id || getId(),
+            timelineElement: element,
+            timeline: gsap.timeline({ paused: true }),
+          },
+          id,
+        );
       }
     });
 
@@ -295,8 +290,8 @@ function glaze(config: GlazeConfig) {
     }
   }
 
-  function start(els = getElements(), restartLast = false) {
-    collect(els);
+  function start(els = getElements(), id = "") {
+    collect(els, id);
 
     const mm: gsap.MatchMedia = gsap.matchMedia();
 
@@ -308,11 +303,11 @@ function glaze(config: GlazeConfig) {
         }).map((key) => [key, key]),
       ),
       (context) => {
-        const tl: {
-          [key: string]: gsap.core.Timeline;
-        } = {};
-
-        (restartLast ? [timelines[timelines.length - 1]] : timelines)
+        (
+          (id
+            ? [timelines.find((timeline) => timeline.id === id)]
+            : timelines) as GlazeTimeline[]
+        )
           .reduce((acc, obj) => new Map([...acc, ...obj.elements]), new Map())
           .forEach((value, element) => {
             let animationObject = {};
@@ -327,15 +322,24 @@ function glaze(config: GlazeConfig) {
             });
 
             const timeline = findTimeline(element);
-            const timelineIndex = findTimelineIndex(element);
             if (!timeline) return;
 
-            if (!tl?.[timeline?.id]) {
-              tl[timeline?.id] = gsap.timeline(timeline?.data);
-              timelines[timelineIndex].timeline = tl[timeline?.id];
-            }
+            if (id) timeline.timeline.progress(0).clear();
 
-            applyAnimationSet(element, animationObject, tl[timeline?.id]);
+            timeline.elements.forEach((data, element) => {
+              gsap.set(element, {
+                clearProps: "all",
+              });
+              Object.values(data).forEach((data) => {
+                if (data.selector) {
+                  gsap.set(getSelectorOrElement(element, data), {
+                    clearProps: "all",
+                  });
+                }
+              });
+            });
+            applyAnimationSet(element, animationObject, timeline.timeline);
+            timeline.timeline.restart();
           });
       },
     );

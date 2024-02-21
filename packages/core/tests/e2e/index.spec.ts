@@ -141,17 +141,33 @@ test.describe("timeline", () => {
       await goToPage(page);
       await page.waitForTimeout(10000);
 
-      const elements = page.locator(".tl-six .stagger");
-      const count = await elements.count();
+      const elements = () => page.locator(".tl-six .box");
+      const count = await elements().count();
 
       for (let i = 0; i < count; i++) {
-        await expect(elements.nth(i)).toHaveCSS(
+        await expect(elements().nth(i)).toHaveCSS(
           "transform",
-          "matrix(1, 0, 0, 1, 500, 0)",
+          "matrix(1, 0, 0, 1, 0, 0)",
         );
-        await expect(elements.nth(i)).toHaveCSS(
+        await expect(elements().nth(i)).toHaveCSS(
           "background-color",
-          "rgb(255, 255, 0)",
+          "rgb(0, 0, 0)",
+        );
+      }
+
+      await page.setViewportSize({ width: 768, height: 768 });
+      await page.waitForTimeout(1000);
+      await page.setViewportSize({ width: 1280, height: 768 });
+      await page.waitForTimeout(10000);
+
+      for (let i = 0; i < count; i++) {
+        await expect(elements().nth(i)).toHaveCSS(
+          "transform",
+          "matrix(1, 0, 0, 1, 0, 0)",
+        );
+        await expect(elements().nth(i)).toHaveCSS(
+          "background-color",
+          "rgb(0, 0, 0)",
         );
       }
     });

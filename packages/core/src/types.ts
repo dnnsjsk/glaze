@@ -39,8 +39,8 @@ type GlazeTimeline = {
   data: GlazeObjectSettings;
   elements: Map<Element, GlazeAnimationObject>;
   id: string;
-  timeline?: gsap.core.Timeline;
-  timelineElement?: Element;
+  timeline: gsap.core.Timeline;
+  timelineElement: Element;
 };
 
 type PlainObject = { [key: string]: any };
