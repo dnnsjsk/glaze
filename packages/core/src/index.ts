@@ -41,6 +41,7 @@ function glaze(config: GlazeConfig) {
     };
   };
 
+  let idCounter = 0;
   const defaultBp = state.breakpoints?.default;
   const breakpoints = state.breakpoints;
   const timelines: GlazeTimeline[] = [];
@@ -75,35 +76,91 @@ function glaze(config: GlazeConfig) {
       ),
     );
 
-  const getId = () => Math.random().toString(36).substring(2, 15);
+  const getId = () => {
+    idCounter++;
+    return `${Math.random().toString(36).substring(2, 15)}-${idCounter}`;
+  };
 
   const matchesTl = (attr: string) =>
     attr === "tl" || attr.includes("tl/") || attr.endsWith(":tl");
 
-  const findTimeline = (element: Element) =>
+  const findTimelineByElement = (element: Element) =>
     timelines.find((timeline) => timeline.elements.has(element));
 
-  const addOrReplaceTimeline = (timeline: GlazeTimeline, id = "") => {
-    if (id) {
-      const index = timelines.findIndex((timeline) => timeline.id === id);
-      if (index === -1) return;
-      timelines[index] = timeline;
+  const findTimelineById = (id: string) =>
+    timelines.find((timeline) => timeline.id === id);
+
+  const addOrReplaceTimeline = (timeline: GlazeTimeline) => {
+    const id = timeline.id;
+    const index = timelines.findIndex((timeline) => timeline.id === id);
+
+    if (id && index !== -1) {
+      timelines[index] = {
+        ...timeline,
+        timeline: timelines[index].timeline,
+      };
       return;
-    } else {
-      timelines.push(timeline);
     }
+
+    timelines.push(timeline);
   };
+
+  function findClosestMatchingAncestor(element: Element): Element | null {
+    let currentElement = element.parentElement;
+
+    while (currentElement) {
+      if (currentElement.hasAttribute(state.dataAttribute)) {
+        return currentElement;
+      }
+
+      const classList = Array.from(currentElement.classList);
+      const hasMatchingClass = classList.some((className) =>
+        className.startsWith(state.className || ""),
+      );
+
+      if (hasMatchingClass && state.watch) {
+        return currentElement;
+      }
+
+      currentElement = currentElement.parentElement;
+    }
+
+    return null;
+  }
 
   const debouncedHandleMutation = debounce(
     handleMutation,
     typeof state.watch === "object" ? state.watch.debounceTime || 500 : 500,
   );
 
-  function handleMutation(mutation: MutationRecord) {
-    const timeline = findTimeline(mutation.target as Element);
+  function handleMutation(element: Element) {
+    const timeline = findTimelineByElement(element);
 
-    if (!timeline?.timeline) return;
-    timeline.timeline.progress(0).clear();
+    if (!timeline?.timeline) {
+      let otherTimelineId = "";
+      Object.values(getTimelineElement(element)).forEach((data) => {
+        if (otherTimelineId) return;
+        if (data.tl) {
+          otherTimelineId = Object.keys(data.tl)[0];
+        }
+      });
+
+      if (!otherTimelineId) {
+        start([element], getId());
+        return;
+      }
+
+      const otherTimeline = findTimelineById(otherTimelineId);
+      const otherTimelineElements = [
+        otherTimeline?.timelineElement,
+        ...(otherTimeline?.elements.keys() || []),
+        element,
+      ] as Element[];
+      otherTimeline?.timeline.progress(0).clear();
+      start(otherTimelineElements, otherTimelineId);
+      return;
+    }
+
     start(
       [
         ...Array.from(timeline.elements.keys()),
@@ -127,17 +184,40 @@ function glaze(config: GlazeConfig) {
             .getAttribute("class")
             ?.includes(state.className);
 
-        if (!isAttribute && !isClass) return;
+        if (!isAttribute && !isClass && mutation.type !== "childList") return;
+
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+              if (
+                (state.className &&
+                  element.getAttribute("class")?.includes(state.className)) ||
+                element.hasAttribute(state.dataAttribute)
+              ) {
+                debouncedHandleMutation(element);
+              } else {
+                const closestMatchingAncestor =
+                  findClosestMatchingAncestor(element);
+                if (closestMatchingAncestor) {
+                  debouncedHandleMutation(closestMatchingAncestor);
+                }
+              }
+            }
+          });
+        }
+
         const newData = getTimelineElement(mutation.target as Element);
         const oldData = timelines
           .find((timeline) => {
             return timeline.elements.has(mutation.target as Element);
           })
           ?.elements.get(mutation.target as Element);
+
         if (JSON.stringify(newData) === JSON.stringify(oldData)) return;
         if (!oldData || !newData) return;
 
-        debouncedHandleMutation(mutation);
+        debouncedHandleMutation(mutation.target as Element);
       });
     });
 
@@ -148,6 +228,7 @@ function glaze(config: GlazeConfig) {
         ...(state.className ? ["class"] : []),
       ],
       subtree: true,
+      childList: true,
     };
 
     observer.observe(target, mutationConfig);
@@ -208,17 +289,14 @@ function glaze(config: GlazeConfig) {
       );
 
       const timelineBp = timelineData?.breakpoint || defaultBp;
-      addOrReplaceTimeline(
-        {
-          breakpoint: timelineBp,
-          data: parsedData,
-          elements,
-          id: timelineData?.id || getId(),
-          timelineElement: element,
-          timeline: gsap.timeline({ ...parsedData, paused: true }),
-        },
-        id,
-      );
+      addOrReplaceTimeline({
+        breakpoint: timelineBp,
+        data: parsedData,
+        elements,
+        id: id || timelineData?.id || getId(),
+        timelineElement: element,
+        timeline: gsap.timeline({ ...parsedData, paused: true }),
+      });
     }
 
     return processedElements;
@@ -243,24 +321,19 @@ function glaze(config: GlazeConfig) {
         (timeline) => timeline.elements?.has(element) && timeline.breakpoint,
       )?.breakpoint;
 
-      const timeline = timelines.find((timeline) =>
-        timeline.elements?.has(element),
-      );
-
+      const timeline = findTimelineByElement(element);
       const elements = new Map<Element, GlazeAnimationObject>();
+
       if (!timeline || id !== "") {
         elements.set(element, getTimelineElement(element));
-        addOrReplaceTimeline(
-          {
-            breakpoint: timelineMatchMedia || defaultBp,
-            data: {},
-            elements,
-            id: timeline?.id || getId(),
-            timelineElement: element,
-            timeline: gsap.timeline({ paused: true }),
-          },
-          id,
-        );
+        addOrReplaceTimeline({
+          breakpoint: timelineMatchMedia || defaultBp,
+          data: {},
+          elements,
+          id: id || timeline?.id || getId(),
+          timelineElement: element,
+          timeline: gsap.timeline({ paused: true }),
+        });
       }
     });
 
@@ -303,6 +376,13 @@ function glaze(config: GlazeConfig) {
         }).map((key) => [key, key]),
       ),
       (context) => {
+        if (id) {
+          const timeline = findTimelineById(id);
+          if (timeline) {
+            timeline.timeline.progress(0).clear();
+          }
+        }
+
         (
           (id
             ? [timelines.find((timeline) => timeline.id === id)]
@@ -321,10 +401,8 @@ function glaze(config: GlazeConfig) {
               }
             });
 
-            const timeline = findTimeline(element);
+            const timeline = findTimelineByElement(element);
             if (!timeline) return;
-
-            if (id) timeline.timeline.progress(0).clear();
 
             timeline.elements.forEach((data, element) => {
               gsap.set(element, {

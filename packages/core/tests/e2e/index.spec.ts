@@ -15,8 +15,10 @@ test.describe("timeline", () => {
     await goToPage(page);
     await page.waitForTimeout(10000);
 
-    const elements = page.locator("[class='tl-main']");
+    const elements = page.locator("[class*='tl-main']");
     const count = await elements.count();
+
+    expect(count).toBe(6);
 
     for (let i = 0; i < count; i++) {
       await expect(elements.nth(i)).toHaveCSS(
@@ -25,7 +27,7 @@ test.describe("timeline", () => {
       );
       await expect(elements.nth(i)).toHaveCSS(
         "background-color",
-        "rgb(255, 192, 203)",
+        "rgb(255, 0, 0)",
       );
     }
   });
@@ -144,6 +146,8 @@ test.describe("timeline", () => {
       const elements = () => page.locator(".tl-six .box");
       const count = await elements().count();
 
+      expect(count).toBe(4);
+
       for (let i = 0; i < count; i++) {
         await expect(elements().nth(i)).toHaveCSS(
           "transform",
@@ -170,6 +174,24 @@ test.describe("timeline", () => {
           "rgb(0, 0, 0)",
         );
       }
+    });
+  });
+
+  test.describe("seven", () => {
+    test("has correct values", async ({ page }) => {
+      await goToPage(page);
+      await page.waitForTimeout(10000);
+
+      const elements = page.locator(".tl-seven");
+      const count = await elements.count();
+
+      expect(count).toBe(1);
+
+      await expect(elements).toHaveCSS(
+        "transform",
+        "matrix(1, 0, 0, 1, 500, 0)",
+      );
+      await expect(elements).toHaveCSS("background-color", "rgb(255, 0, 255)");
     });
   });
 });

@@ -16,21 +16,49 @@ const { timelines } = glaze({
   watch: true,
 });
 
-setTimeout(() => {
-  const tl = timelines[timelines.length - 1];
+const tlLast = timelines[timelines.length - 1];
+const tlFirst = timelines[0];
 
-  for (const [element] of tl.elements) {
-    if (!element) continue;
-    const animateObject = element.getAttribute("data-animate");
-    if (animateObject) {
-      element.setAttribute(
-        "data-animate",
-        animateObject.replace("yellow", "pink"),
-      );
-    }
-    const classes = element.getAttribute("class") || "";
-    if (classes) {
-      element.setAttribute("class", classes.replace("yellow", "pink"));
-    }
+let indexFirst = 0;
+for (const [element] of tlFirst.elements) {
+  indexFirst++;
+  if (indexFirst !== 3) continue;
+
+  setTimeout(() => {
+    const clone = element.cloneNode(true);
+    document.body.appendChild(clone);
+  }, 1000);
+}
+
+let indexLast = 0;
+for (const [element] of tlLast.elements) {
+  indexLast++;
+  if (!element) continue;
+
+  setTimeout(() => {
+    const clone = element.children[0].cloneNode(true);
+    element.appendChild(clone);
+  }, 2000);
+
+  const animateObject = element.getAttribute("data-animate");
+  if (animateObject) {
+    element.setAttribute(
+      "data-animate",
+      animateObject.replace("yellow", "pink"),
+    );
   }
-}, 1000);
+  const classes = element.getAttribute("class") || "";
+  if (classes) {
+    element.setAttribute("class", classes.replace("yellow", "pink"));
+  }
+}
+
+setTimeout(() => {
+  const element = document.createElement("div");
+  element.classList.add(
+    "tl-seven",
+    "box",
+    "animate-@lg:to:x-500|duration-3|background-fuchsia|ease-power2.inOut",
+  );
+  document.body.appendChild(element);
+}, 3000);
