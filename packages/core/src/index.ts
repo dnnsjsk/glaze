@@ -152,12 +152,7 @@ function glaze(config: GlazeConfig) {
     typeof state.watch === "object" ? state.watch.debounceTime || 500 : 500,
   );
 
-  function handleMutation(element: Element, id = "") {
-    if (id) {
-      start([element], id);
-      return;
-    }
-
+  function handleMutation(element: Element) {
     const timeline = findTimelineByElements(element);
 
     if (!timeline?.timeline) {
@@ -224,21 +219,18 @@ function glaze(config: GlazeConfig) {
                   element.getAttribute("class")?.includes(state.className))
               ) {
                 if (!shouldMutate(element)) return;
-                const id = findTimelineByTimelineElement(element)?.id;
-                console.log("childList: attribute/class change");
-                debouncedHandleMutation(element, id);
+                console.log("mutation - childList: attribute/class change");
+                debouncedHandleMutation(element);
                 return;
               } else {
                 const closestMatchingAncestor =
                   findClosestMatchingAncestor(element);
                 if (!closestMatchingAncestor) return;
                 if (closestMatchingAncestor) {
-                  const id = findTimelineByTimelineElement(
-                    closestMatchingAncestor,
-                  )?.id;
-                  if (!id) return;
-                  console.log("childList: closest matching ancestor");
-                  debouncedHandleMutation(closestMatchingAncestor, id);
+                  console.log(
+                    "mutation - childList: closest matching ancestor",
+                  );
+                  debouncedHandleMutation(closestMatchingAncestor);
                   return;
                 }
               }
@@ -249,7 +241,7 @@ function glaze(config: GlazeConfig) {
         }
 
         if (!shouldMutate(mutation.target as Element)) return;
-        console.log("attribute/class change");
+        console.log("mutation - attribute/class change");
         debouncedHandleMutation(mutation.target as Element);
       });
     });
