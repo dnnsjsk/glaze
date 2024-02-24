@@ -33,12 +33,13 @@ describe("castValue", () => {
 
   it('returns the result of getSelectorOrElement for strings starting with "&"', () => {
     const element = document.createElement("div");
-    const result = castValue("&selector", element, "trigger");
+    castValue("&", element, "trigger");
     expect(getSelectorOrElement).toHaveBeenCalledWith(
       element,
-      "&selector",
+      {
+        selector: { value: "&" },
+      },
       true,
     );
-    expect(result).toBe("Mocked: &selector");
   });
 });

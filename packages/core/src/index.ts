@@ -429,18 +429,20 @@ function glaze(config: GlazeConfig) {
             const timeline = findTimelineByElements(element);
             if (!timeline) return;
 
-            timeline.elements.forEach((data, element) => {
-              gsap.set(element, {
-                clearProps: "all",
+            if (state.watch) {
+              timeline.elements.forEach((data, element) => {
+                gsap.set(element, {
+                  clearProps: "all",
+                });
+                Object.values(data).forEach((data) => {
+                  if (data.selector) {
+                    gsap.set(getSelectorOrElement(element, data), {
+                      clearProps: "all",
+                    });
+                  }
+                });
               });
-              Object.values(data).forEach((data) => {
-                if (data.selector) {
-                  gsap.set(getSelectorOrElement(element, data), {
-                    clearProps: "all",
-                  });
-                }
-              });
-            });
+            }
 
             applyAnimationSet(element, animationObject, timeline.timeline);
 
