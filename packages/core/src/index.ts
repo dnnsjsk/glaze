@@ -441,8 +441,16 @@ function glaze(config: GlazeConfig) {
                 }
               });
             });
+
             applyAnimationSet(element, animationObject, timeline.timeline);
-            timeline.timeline.restart();
+
+            if (
+              !timeline.timeline.scrollTrigger ||
+              (timeline.timeline.scrollTrigger &&
+                timeline.timeline.scrollTrigger.isActive)
+            ) {
+              timeline.timeline.restart();
+            }
           });
       },
     );
