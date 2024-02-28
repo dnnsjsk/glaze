@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import mergeDeep from "../../src/utils/mergeDeep";
+import mergeDeep from "../../../src/utils/mergeDeep";
 
 describe("mergeDeep", () => {
   it("merges two simple objects", () => {

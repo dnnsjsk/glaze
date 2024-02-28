@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import parseTimeline from "../../src/utils/parseTimeline";
+import parseTimeline from "../../../src/utils/parseTimeline";
 
 describe("parseTimeline", () => {
   const breakpoints = {

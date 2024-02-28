@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import castValue from "../../src/utils/castValue.ts";
-import getSelectorOrElement from "../../src/utils/getSelectorOrElement.ts";
+import castValue from "../../../src/utils/castValue.ts";
+import getSelectorOrElement from "../../../src/utils/getSelectorOrElement.ts";
 
-vi.mock("../../src/utils/getSelectorOrElement", () => ({
+vi.mock("../../../src/utils/getSelectorOrElement", () => ({
   default: vi.fn((_element, selector) => {
     return `Mocked: ${selector}`;
   }),
@@ -33,12 +33,13 @@ describe("castValue", () => {
 
   it('returns the result of getSelectorOrElement for strings starting with "&"', () => {
     const element = document.createElement("div");
-    const result = castValue("&selector", element, "trigger");
+    castValue("&", element, "trigger");
     expect(getSelectorOrElement).toHaveBeenCalledWith(
       element,
-      "&selector",
+      {
+        selector: { value: "&" },
+      },
       true,
     );
-    expect(result).toBe("Mocked: &selector");
   });
 });

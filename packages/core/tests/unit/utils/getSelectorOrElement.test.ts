@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import getSelectorOrElement from "../../src/utils/getSelectorOrElement";
+import getSelectorOrElement from "../../../src/utils/getSelectorOrElement";
 import { GlazeAnimationObject } from "@/types.ts";
 
 describe("getSelectorOrElement", () => {

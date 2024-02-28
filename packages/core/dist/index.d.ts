@@ -1,29 +1,21 @@
 import { GlazeAnimationCollection, GlazeAnimationObject, GlazeConfig, GlazeTimeline, PlainObject } from './types.ts';
 declare function glaze(config: GlazeConfig): {
-    start: () => void;
-    kill: () => void;
-    restart: () => void;
-    data: {
-        state: Omit<GlazeConfig, "gsap"> & {
-            element: Document | Element;
-            breakpoints: {
-                [key: string]: string;
-                default: string;
-            };
-        };
+    breakpoints: {
+        [key: string]: string | undefined;
+        default?: string | undefined;
+    } & {
+        [key: string]: string;
+        default: string;
+    };
+    state: Omit<GlazeConfig, "gsap"> & {
+        dataAttribute: string;
+        element: Document | Element;
         breakpoints: {
-            [key: string]: string | undefined;
-            default?: string | undefined;
-        } & {
             [key: string]: string;
             default: string;
         };
-        elements: GlazeAnimationCollection[];
-        timelines: GlazeTimeline[];
-        animations: Map<Element, {
-            [key: string]: GlazeAnimationObject;
-        }>;
     };
+    timelines: GlazeTimeline[];
 };
 export default glaze;
 export type { GlazeAnimationCollection, GlazeAnimationObject, GlazeConfig, GlazeTimeline, PlainObject, };

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import parseToObject from "../../src/utils/parseToObject";
+import parseToObject from "../../../src/utils/parseToObject";
 
 describe("parseToObject", () => {
   const element = document.createElement("div");

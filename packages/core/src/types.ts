@@ -16,12 +16,18 @@ type GlazeConfig = {
     [key: string]: string | undefined;
   };
   dataAttribute?: string;
+  className?: string;
   element?: Document | Element;
   lib: {
     gsap: {
       core: typeof import("gsap").gsap;
     };
   };
+  watch?:
+    | boolean
+    | {
+        debounceTime?: number;
+      };
 };
 
 type GlazeObjectSettings = {
@@ -29,11 +35,12 @@ type GlazeObjectSettings = {
 };
 
 type GlazeTimeline = {
-  id: string;
-  data: GlazeObjectSettings;
-  elements: Element[];
   breakpoint: string;
-  timeline: typeof import("gsap").gsap.core.Timeline.prototype;
+  data: GlazeObjectSettings;
+  elements: Map<Element, GlazeAnimationObject>;
+  id: string;
+  timeline: gsap.core.Timeline;
+  timelineElement: Element;
 };
 
 type PlainObject = { [key: string]: any };

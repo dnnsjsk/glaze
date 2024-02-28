@@ -1,6 +1,6 @@
 {
   "name": "glazejs",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Utility-based animations for the web.",
   "author": "Dennis Josek <hi@dennn.is> (https://dennn.is)",
   "homepage": "https://glaze.dev",
@@ -26,12 +26,17 @@
     "gsap"
   ],
   "scripts": {
+    "build": "pnpm run test:unit && tsc && vite build && node scripts/postbuild.js",
     "dev": "vite",
-    "test": "vitest",
-    "build": "vitest --watch=false && tsc && vite build && node scripts/postbuild.js",
-    "release": "npm run build && npm publish"
+    "release": "npm run build && npm publish",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:e2e": "npx playwright test",
+    "test:unit": "vitest --watch=false --config vitest.config.unit.ts",
+    "test:unit-watch": "vitest --watch=true --config vitest.config.unit.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
+    "@types/node": "18.19.14",
     "gsap": "^3.12.5",
     "jsdom": "^24.0.0",
     "prettier": "^3.2.5",

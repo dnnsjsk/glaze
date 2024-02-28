@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Glaze dev</title>
+    <style>
+      body,
+      .group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .box {
+        width: 40px;
+        height: 40px;
+        border-radius: 4px;
+        border: 1px solid inherit;
+        background: #000000;
+      }
+    </style>
+  </head>
+  <body class="overflow-x-hidden">
+    <div class="group animate-tl/main" data-animate="defaults:duration-3|ease-power2.inOut">
+      <div class="box tl-main animate-to:x-500|background-red"></div>
+      <div class="box tl-main" data-animate="tl:[-=2] to:x-500|background-red"></div>
+    </div>
+    <div class="box tl-main" data-animate="tl:main to:x-500|background-red"></div>
+    <div class="group" data-animate="tl defaults:duration-3|ease-power2.inOut">
+      <div class="box tl-two" data-animate="to:x-500|background-blue"></div>
+      <div class="box tl-two" data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
+    </div>
+    <div
+      class="box tl-three animate-to:duration-2|x-500|background-green|ease-power2.inOut"
+    ></div>
+    <div
+      class="box tl-four"
+      data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
+    ></div>
+    <div
+      class="box tl-five"
+      data-animate="to:duration-3|x-500|background-yellow|ease-power2.inOut @lg:to:background-purple"
+    ></div>
+    <div class="box tl-main" data-animate="tl:main-[-=2] to:x-500|background-red"></div>
+    <div class="box tl-main animate-tl:main-[-=2]" data-animate="to:x-500|background-red"></div>
+    <div class="group tl-six animate-@lg:[&>div]:from:x-500|background-yellow|duration-3|stagger-1.5|ease-power2.inOut">
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+    </div>
+    <script type="module" src="index.ts"></script>
+  </body>
+</html>

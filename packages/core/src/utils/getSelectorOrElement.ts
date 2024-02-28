@@ -12,6 +12,7 @@ function getSelectorOrElement(
     const startsWithAnd = selector.startsWith("&");
     if (startsWithAnd) {
       const string = selector?.replace("&", ":scope");
+      if (string === ":scope") return element;
       if (single) return element.querySelector(string);
       return element.querySelectorAll(string);
     }

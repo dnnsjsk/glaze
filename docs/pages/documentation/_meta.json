@@ -6,6 +6,7 @@
     "title": "Usage"
   },
   "syntax": "Syntax",
+  "selectors": "Selectors",
   "breakpoints": "Breakpoints",
   "timelines": "Timelines",
   "scrolltrigger": "ScrollTrigger",

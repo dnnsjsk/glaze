@@ -9,7 +9,11 @@ function castValue(
   const cleanedValue = value.replace(/^\[|]$/g, "").replaceAll("_", " ");
 
   if (cleanedValue.startsWith("&")) {
-    return getSelectorOrElement(element, value, ["trigger"].includes(key));
+    return getSelectorOrElement(
+      element,
+      { selector: { value: cleanedValue } },
+      ["scrollTrigger", "trigger"].includes(key),
+    );
   }
 
   if (cleanedValue === "true" || cleanedValue === "false") {
