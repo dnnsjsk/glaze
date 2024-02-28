@@ -3,7 +3,7 @@
 ## 1.1.0
 
 - New: `watch` option to watch changes to animation attributes in DOM, updating animations accordingly
-- New: `className` option to add class prefix create animations from classes, e.g. `animate-to:x-500`
+- New: `className` option to add class prefixes and create animations from classes, e.g. `animate-to:x-500`
 - Fix: element selector returning null when just using `&`
 - Fix: `from` animations not restarting when using breakpoints
 
