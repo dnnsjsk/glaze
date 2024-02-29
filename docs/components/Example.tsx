@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import glaze from "../../packages/core/dist/index.es";
+import glaze from "glazejs";
 import gsap from "gsap";
 
 const Example = ({ children }) => {
