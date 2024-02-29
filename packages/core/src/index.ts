@@ -350,14 +350,27 @@ function glaze(config: GlazeConfig) {
       const elements = new Map<Element, GlazeAnimationObject>();
 
       if (!timeline || id !== "") {
-        elements.set(element, getTimelineElement(element));
+        const elementData = getTimelineElement(element);
+        let elementScrollTrigger = null;
+        Object.values(elementData).forEach((value) => {
+          Object.values(value).forEach((val) => {
+            if (val.scrollTrigger) {
+              elementScrollTrigger = val.scrollTrigger;
+              delete val.scrollTrigger;
+            }
+          });
+        });
+        elements.set(element, elementData);
+        const timelineData = elementScrollTrigger
+          ? { scrollTrigger: elementScrollTrigger }
+          : {};
         addOrReplaceTimeline({
           breakpoint: timelineMatchMedia || defaultBp,
-          data: {},
+          data: timelineData as GlazeAnimationObject,
           elements,
           id: id || timeline?.id || getId(),
           timelineElement: element,
-          timeline: gsap.timeline({ paused: true }),
+          timeline: gsap.timeline({ ...timelineData, paused: true }),
         });
       }
     });
@@ -388,6 +401,23 @@ function glaze(config: GlazeConfig) {
     }
   }
 
+  function reset(timeline: GlazeTimeline) {
+    timeline.elements.forEach(
+      (data: GlazeAnimationObject, element: Element) => {
+        gsap.set(element, {
+          clearProps: "all",
+        });
+        Object.values(data).forEach((data) => {
+          if (data.selector) {
+            gsap.set(getSelectorOrElement(element, data), {
+              clearProps: "all",
+            });
+          }
+        });
+      },
+    );
+  }
+
   function start(els = getElements(), id = "") {
     collect(els, id);
 
@@ -401,12 +431,7 @@ function glaze(config: GlazeConfig) {
         }).map((key) => [key, key]),
       ),
       (context) => {
-        if (id) {
-          const timeline = findTimelineById(id);
-          if (timeline) {
-            timeline.timeline.progress(0).clear();
-          }
-        }
+        const resettedIds: string[] = [];
 
         (
           (id
@@ -429,21 +454,12 @@ function glaze(config: GlazeConfig) {
             const timeline = findTimelineByElements(element);
             if (!timeline) return;
 
-            if (state.watch) {
-              timeline.elements.forEach((data, element) => {
-                gsap.set(element, {
-                  clearProps: "all",
-                });
-                Object.values(data).forEach((data) => {
-                  if (data.selector) {
-                    gsap.set(getSelectorOrElement(element, data), {
-                      clearProps: "all",
-                    });
-                  }
-                });
-              });
+            if (!resettedIds.includes(timeline.id)) {
+              resettedIds.push(timeline.id);
+              timeline.timeline.progress(0).clear();
             }
 
+            reset(timeline);
             applyAnimationSet(element, animationObject, timeline.timeline);
 
             if (
@@ -454,6 +470,8 @@ function glaze(config: GlazeConfig) {
               timeline.timeline.restart();
             }
           });
+
+        return () => timelines.forEach((timeline) => reset(timeline));
       },
     );
   }

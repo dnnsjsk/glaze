@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Fix: `watch` option not resetting properly when using `from` animations
+
 ## 1.1.0
 
 - New: `watch` option to watch changes to animation attributes in DOM, updating animations accordingly
