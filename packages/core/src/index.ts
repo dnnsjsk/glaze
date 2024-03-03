@@ -460,7 +460,9 @@ function glaze(config: GlazeConfig) {
             }
 
             reset(timeline);
-            applyAnimationSet(element, animationObject, timeline.timeline);
+            setTimeout(() => {
+              applyAnimationSet(element, animationObject, timeline.timeline);
+            });
 
             if (
               !timeline.timeline.scrollTrigger ||

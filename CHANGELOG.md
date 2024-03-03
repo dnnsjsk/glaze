@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- Fix: `from` animations flash of initial state
+
 ## 1.1.1
 
 - Fix: `watch` option not resetting properly when using `from` animations
