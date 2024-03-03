@@ -457,12 +457,10 @@ function glaze(config: GlazeConfig) {
             if (!resettedIds.includes(timeline.id)) {
               resettedIds.push(timeline.id);
               timeline.timeline.progress(0).clear();
+              reset(timeline);
             }
 
-            reset(timeline);
-            setTimeout(() => {
-              applyAnimationSet(element, animationObject, timeline.timeline);
-            });
+            applyAnimationSet(element, animationObject, timeline.timeline);
 
             if (
               !timeline.timeline.scrollTrigger ||

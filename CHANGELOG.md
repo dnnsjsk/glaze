@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+- Fix: `from` animations flash of initial state #2
+
 ## 1.1.2
 
 - Fix: `from` animations flash of initial state
