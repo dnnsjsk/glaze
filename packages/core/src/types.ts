@@ -16,12 +16,19 @@ type GlazeConfig = {
     [key: string]: string | undefined;
   };
   dataAttribute?: string;
+  defaults?: {
+    tl?: string;
+    element?: string;
+  };
   className?: string;
   element?: Document | Element;
   lib: {
     gsap: {
       core: typeof import("gsap").gsap;
     };
+  };
+  presets?: {
+    [key: string]: string;
   };
   watch?:
     | boolean

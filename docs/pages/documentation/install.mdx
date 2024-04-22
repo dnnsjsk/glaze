@@ -35,6 +35,15 @@ glaze({
   breakpoints: {
     default: "(min-width: 1px)",
   },
+  // defaults for animations
+  defaults: {
+    tl: "ease-power2.inOut",
+    element: "to:x-500",
+  },
+  // custom presets
+  presets: {
+    helicopter: "from:rotate-2160|duration-10",
+  },
   // watch elements for changes and restart animations with new settings
   watch: false,
 });

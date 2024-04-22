@@ -66,7 +66,19 @@ function glaze(config: GlazeConfig) {
         .join(" ");
     }
 
-    return `${attribute} ${classes}`.trim();
+    let presets = "";
+    const allStrings = `${attribute} ${classes}`.trim();
+
+    if (state?.presets) {
+      Object.entries(state.presets).forEach(([key, value]) => {
+        allStrings.split(" ").forEach((str) => {
+          if (str === `preset-${key}`) presets += ` ${value}`;
+        });
+      });
+      presets = presets.trim();
+    }
+
+    return `${allStrings} ${presets}`.trim();
   };
 
   const getElements = (element: Document | Element = state.element) =>
@@ -292,7 +304,7 @@ function glaze(config: GlazeConfig) {
       [
         ...getElements(element),
         ...(timelineData?.id
-          ? document.querySelectorAll(
+          ? state.element.querySelectorAll(
               `[${state.dataAttribute}*="tl:${timelineData.id}"]${
                 state.className
                   ? `, [class^="${state.className}-tl:${timelineData.id}"], [class*="${state.className}-tl:${timelineData.id}"]`
@@ -313,14 +325,24 @@ function glaze(config: GlazeConfig) {
         element,
       );
 
+      let defaults = {};
+      if (state.defaults?.tl) {
+        defaults = {
+          defaults: parseToObject(state.defaults.tl, true, element),
+        };
+      }
+
+      const mergedData = {};
+      mergeDeep(mergedData, defaults, parsedData);
+
       const timelineBp = timelineData?.breakpoint || defaultBp;
       addOrReplaceTimeline({
         breakpoint: timelineBp,
-        data: parsedData,
+        data: mergedData,
         elements,
         id: id || timelineData?.id || getId(),
         timelineElement: element,
-        timeline: gsap.timeline({ ...parsedData, paused: true }),
+        timeline: gsap.timeline({ ...mergedData, paused: true }),
       });
     }
 
@@ -444,12 +466,16 @@ function glaze(config: GlazeConfig) {
 
             Object.entries(value).forEach(([key, value]) => {
               if (context.conditions?.[key]) {
-                animationObject = mergeDeep(
-                  animationObject,
-                  value as PlainObject,
-                );
+                mergeDeep(animationObject, value as PlainObject);
               }
             });
+
+            if (state?.defaults?.element) {
+              mergeDeep(
+                animationObject,
+                parseToObject(state.defaults.element, false, element),
+              );
+            }
 
             const timeline = findTimelineByElements(element);
             if (!timeline) return;

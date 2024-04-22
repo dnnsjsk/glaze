@@ -14,6 +14,13 @@ const { timelines } = glaze({
   },
   className: "animate",
   watch: true,
+  presets: {
+    helicopter:
+      "from:rotate-2160 to:rotate-45|x-500|background-yellow|duration-3",
+  },
+  defaults: {
+    tl: "duration-3",
+  },
 });
 
 const tlLast = timelines[timelines.length - 1];

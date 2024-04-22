@@ -18,6 +18,9 @@ const Example = ({ children }) => {
         sm: "(min-width: 640px)",
         lg: "(min-width: 1024px)",
       },
+      presets: {
+        helicopter: "from:rotate-2160|duration-5",
+      },
     });
   }, []);
 

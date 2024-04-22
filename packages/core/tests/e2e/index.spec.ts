@@ -11,6 +11,22 @@ test("no animations below 640px", async ({ page }) => {
 });
 
 test.describe("timeline", () => {
+  test("preset has correct values", async ({ page }) => {
+    await goToPage(page);
+    await page.waitForTimeout(10000);
+
+    const elements = page.locator(".tl-preset");
+    const count = await elements.count();
+
+    expect(count).toBe(1);
+
+    await expect(elements).toHaveCSS(
+      "transform",
+      "matrix(0.707107, 0.707107, -0.707107, 0.707107, 500, 0)",
+    );
+    await expect(elements).toHaveCSS("background-color", "rgb(255, 255, 0)");
+  });
+
   test("main has correct values", async ({ page }) => {
     await goToPage(page);
     await page.waitForTimeout(10000);

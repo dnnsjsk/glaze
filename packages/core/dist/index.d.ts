@@ -1,4 +1,5 @@
 import { GlazeAnimationCollection, GlazeAnimationObject, GlazeConfig, GlazeTimeline, PlainObject } from './types.ts';
+
 declare function glaze(config: GlazeConfig): {
     breakpoints: {
         [key: string]: string | undefined;
@@ -11,8 +12,8 @@ declare function glaze(config: GlazeConfig): {
         dataAttribute: string;
         element: Document | Element;
         breakpoints: {
-            [key: string]: string;
             default: string;
+            [key: string]: string;
         };
     };
     timelines: GlazeTimeline[];

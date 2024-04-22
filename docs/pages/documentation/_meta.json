@@ -10,5 +10,7 @@
   "breakpoints": "Breakpoints",
   "timelines": "Timelines",
   "scrolltrigger": "ScrollTrigger",
+  "defaults": "Defaults",
+  "presets": "Presets",
   "changelog": "Changelog"
 }

@@ -39,12 +39,13 @@ describe("glaze", () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="test-container">
-        <div class="group animate-tl/main" data-animate="defaults:duration-3|ease-power2.inOut">
+        <div class="box tl-preset animate-preset-helicopter"></div>
+        <div class="group animate-tl/main" data-animate="defaults:ease-power2.inOut">
           <div class="box tl-main animate-to:x-500|background-red"></div>
           <div class="box tl-main" data-animate="tl:[-=2] to:x-500|background-red"></div>
         </div>
         <div class="box tl-main" data-animate="tl:main to:x-500|background-red"></div>
-        <div class="group" data-animate="tl defaults:duration-3|ease-power2.inOut">
+        <div class="group" data-animate="tl defaults:ease-power2.inOut">
           <div class="box tl-two" data-animate="to:x-500|background-blue"></div>
           <div class="box tl-two" data-animate="tl:[-=2] to:x-500|background-blue @lg:to:background-navy"></div>
         </div>
@@ -77,6 +78,13 @@ describe("glaze", () => {
       },
       element: container,
       className: "animate",
+      presets: {
+        helicopter:
+          "from:rotate-2160 to:rotate-45|x-500|background-yellow|duration-3",
+      },
+      defaults: {
+        tl: "duration-3",
+      },
     });
   });
 
@@ -106,12 +114,34 @@ describe("glaze", () => {
       glazeInstance.timelines
         .map((tl) => Array.from(tl.elements.keys()))
         .flat(),
-    ).toHaveLength(11);
+    ).toHaveLength(12);
+  });
+
+  it("return correct preset element", () => {
+    const tl = glazeInstance.timelines[2];
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(elements).toHaveLength(1);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 640px)": {
+        from: {
+          rotate: 2160,
+        },
+        to: {
+          rotate: 45,
+          x: 500,
+          background: "yellow",
+          duration: 3,
+        },
+      },
+    });
   });
 
   it("returns correct main timeline", () => {
     const tl = glazeInstance.timelines.find((tl) => tl.id === "main");
-    console.log(tl);
     if (!tl) throw new Error("Timeline not found");
 
     const elements = Array.from(tl.elements.keys());
@@ -218,7 +248,7 @@ describe("glaze", () => {
   });
 
   it("returns correct third timeline", () => {
-    const tl = glazeInstance.timelines[2];
+    const tl = glazeInstance.timelines[3];
     if (!tl) throw new Error("Timeline not found");
 
     const elements = Array.from(tl.elements.keys());
@@ -239,32 +269,6 @@ describe("glaze", () => {
   });
 
   it("returns correct fourth timeline", () => {
-    const tl = glazeInstance.timelines[3];
-    if (!tl) throw new Error("Timeline not found");
-
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
-
-    expect(tl.data).toStrictEqual({});
-    expect(elements).toHaveLength(1);
-    expect(values[0]).toStrictEqual({
-      "(min-width: 640px)": {
-        to: {
-          duration: 3,
-          x: 500,
-          background: "yellow",
-          ease: "power2.inOut",
-        },
-      },
-      "(min-width: 1024px)": {
-        to: {
-          background: "purple",
-        },
-      },
-    });
-  });
-
-  it("returns correct fifth timeline", () => {
     const tl = glazeInstance.timelines[4];
     if (!tl) throw new Error("Timeline not found");
 
@@ -290,8 +294,34 @@ describe("glaze", () => {
     });
   });
 
-  it("returns correct sixth timeline", () => {
+  it("returns correct fifth timeline", () => {
     const tl = glazeInstance.timelines[5];
+    if (!tl) throw new Error("Timeline not found");
+
+    const elements = Array.from(tl.elements.keys());
+    const values = Array.from(tl.elements.values());
+
+    expect(tl.data).toStrictEqual({});
+    expect(elements).toHaveLength(1);
+    expect(values[0]).toStrictEqual({
+      "(min-width: 640px)": {
+        to: {
+          duration: 3,
+          x: 500,
+          background: "yellow",
+          ease: "power2.inOut",
+        },
+      },
+      "(min-width: 1024px)": {
+        to: {
+          background: "purple",
+        },
+      },
+    });
+  });
+
+  it("returns correct sixth timeline", () => {
+    const tl = glazeInstance.timelines[6];
     if (!tl) throw new Error("Timeline not found");
 
     const elements = Array.from(tl.elements.keys());

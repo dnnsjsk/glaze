@@ -1,0 +1,16 @@
+# Defaults
+
+It is possible to set default values for timelines and elements using the
+`defaults` option.
+
+```js copy
+glaze({
+  defaults: {
+    tl: "ease-power2.inOut",
+    element: "to:x-500",
+  },
+});
+```
+
+Now, every timeline will use the `ease-power2.inOut` easing function and every
+element will move to the left by 500 pixels.
