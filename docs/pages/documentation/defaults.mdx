@@ -6,14 +6,17 @@ It is possible to set default values for timelines and elements using the
 ```js copy
 glaze({
   defaults: {
-    tl: "defaults:ease-power2.inOut",
+    tl: "defaults:ease-power2.inOut scrollTrigger.trigger-[&]",
     element: "to:x-500",
   },
 });
 ```
 
-Now, every timeline will use the `ease-power2.inOut` easing function and every
-element will move to the left by 500 pixels.
+Every timeline will use the `ease-power2.inOut` easing function and every
+element will move to the left by 500 pixels. On top of that, every element will
+be scrolled into view when it is being scrolled into view.
+
+## Note on timelines
 
 Glaze creates a new timeline for each element by default, even if not marked
 with `tl`. This means that the `tl` defaults option is perfect for applying
