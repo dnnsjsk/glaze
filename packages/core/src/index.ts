@@ -327,9 +327,7 @@ function glaze(config: GlazeConfig) {
 
       let defaults = {};
       if (state.defaults?.tl) {
-        defaults = {
-          defaults: parseToObject(state.defaults.tl, true, element),
-        };
+        defaults = parseToObject(state.defaults.tl, true, element);
       }
 
       const mergedData = {};
@@ -386,13 +384,19 @@ function glaze(config: GlazeConfig) {
         const timelineData = elementScrollTrigger
           ? { scrollTrigger: elementScrollTrigger }
           : {};
+        let defaults = {};
+        if (state.defaults?.tl) {
+          defaults = parseToObject(state.defaults.tl, true, element);
+        }
+        const mergedData = {};
+        mergeDeep(mergedData, defaults, timelineData);
         addOrReplaceTimeline({
           breakpoint: timelineMatchMedia || defaultBp,
           data: timelineData as GlazeAnimationObject,
           elements,
           id: id || timeline?.id || getId(),
           timelineElement: element,
-          timeline: gsap.timeline({ ...timelineData, paused: true }),
+          timeline: gsap.timeline({ ...mergedData, paused: true }),
         });
       }
     });

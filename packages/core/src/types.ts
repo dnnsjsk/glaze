@@ -19,6 +19,7 @@ type GlazeConfig = {
   defaults?: {
     tl?: string;
     element?: string;
+    elementSettings?: string;
   };
   className?: string;
   element?: Document | Element;

@@ -83,7 +83,7 @@ describe("glaze", () => {
           "from:rotate-2160 to:rotate-45|x-500|background-yellow|duration-3",
       },
       defaults: {
-        tl: "duration-3",
+        tl: "defaults:duration-3",
       },
     });
   });

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0
+
+2024-06-05
+
+- Breaking: timeline defaults are not applied directly to `defaults` key anymore
+- New: timeline defaults will also be applied to single elements (Glaze creates a new timeline for each element)
+
 ## 1.2.0
 
 2024-04-23
