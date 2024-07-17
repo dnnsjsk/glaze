@@ -59,7 +59,7 @@ const config: DocsThemeConfig = {
       <p className="mx-auto text-center">
         MIT License © 2024{" "}
         <a href="https://dennn.is" target="_blank" className="link">
-          Dennis Josek
+          dennn.is
         </a>
       </p>
     ),
