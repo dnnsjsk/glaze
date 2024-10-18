@@ -51,6 +51,13 @@ const config: DocsThemeConfig = {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.png" type="image/png" />
         <title>{title !== "Index" ? title + " – Glaze" : "Glaze"}</title>
+        {process.env.NODE_ENV === "production" ? (
+          <script
+            defer
+            data-domain="glaze.dev"
+            src="https://plausible.io/js/script.js"
+          />
+        ) : null}
       </>
     );
   },
