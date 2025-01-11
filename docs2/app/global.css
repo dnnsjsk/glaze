@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --fd-primary: 36 90% 56%;
+}
+
+html {
+  font-feature-settings: "calt", "cv02", "cv03", "cv04", "cv11" !important;
+  font-variation-settings: normal !important;
+
+  &.dark {
+    body {
+      --fd-primary: 40 90% 56%;
+    }
+  }
+}
+
+#nd-home-layout {
+  @apply min-h-screen;
+}
+
+#nd-nav {
+  @apply max-w-[1266px] !important;
+}
