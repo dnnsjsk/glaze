@@ -1,0 +1,42 @@
+---
+title: Defaults
+---
+
+import { Example } from "../../components/Example";
+
+You can create presets for your animations by using the `defaults` object. This
+is useful when you want to apply the same settings to multiple animations.
+
+## Setup
+
+```js copy
+glaze({
+  presets: {
+    helicopter: "from:rotate-2160|duration-5",
+  },
+});
+```
+
+## Usage
+
+```html copy
+<div
+  class="h-20 w-20 rounded-xl bg-amber-500"
+  data-animate="preset-helicopter"
+></div>
+```
+
+<Example>
+  {`
+  <div
+    class="h-20 w-20 rounded-xl bg-amber-500"
+    data-animate="preset-helicopter"
+  ></div>
+`}
+</Example>
+
+Or when using classes:
+
+```html copy
+<div class="animate-preset-helicopter h-20 w-20 rounded-xl bg-amber-500"></div>
+```

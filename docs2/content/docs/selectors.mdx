@@ -1,0 +1,31 @@
+---
+title: Selectors
+---
+
+By default, Glaze will search for elements with the `data-animate` attribute and
+build the animation based on the value of the attribute. It is possible to
+change the attribute during the initialization of the library.
+
+```js copy
+glaze({
+  dataAttribute: "data-move",
+});
+```
+
+## Classname
+
+Alternatively, it is also possible to search for elements with a specific class
+prefix. This is disabled by default.
+
+```js copy
+glaze({
+  className: "animate",
+});
+```
+
+Now Glaze will search for elements with the `animate-` class and build the
+animation based on the value of those classes.
+
+```html copy
+<div data-animate="animate-from:opacity-0"></div>
+```

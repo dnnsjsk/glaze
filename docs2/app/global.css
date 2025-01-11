@@ -24,3 +24,17 @@ html {
 #nd-nav {
   @apply max-w-[1266px] !important;
 }
+
+#nd-sidebar {
+  p {
+    @apply mt-4 md:-mx-1.5;
+
+    &:first-of-type {
+      @apply mt-1;
+    }
+  }
+
+  a[data-active] {
+    @apply md:-mx-1.5;
+  }
+}

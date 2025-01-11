@@ -15,11 +15,4 @@ export const baseOptions: BaseLayoutProps = {
       </span>
     ),
   },
-  links: [
-    {
-      text: "Documentation",
-      url: "/docs",
-      active: "nested-url",
-    },
-  ],
 };
