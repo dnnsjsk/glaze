@@ -15,4 +15,16 @@ export const baseOptions: BaseLayoutProps = {
       </span>
     ),
   },
+  links: [
+    {
+      text: "Documentation",
+      url: "/docs",
+      active: "nested-url",
+    },
+    {
+      text: "GitHub",
+      url: "https://github.com/dnnsjsk/glaze",
+      external: true,
+    },
+  ],
 };

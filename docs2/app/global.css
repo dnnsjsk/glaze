@@ -26,6 +26,10 @@ html {
 }
 
 #nd-sidebar {
+  [data-search-full] {
+    @apply mt-1
+  }
+
   p {
     @apply mt-4 md:-mx-1.5;
 
