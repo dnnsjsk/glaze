@@ -1,16 +1,18 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import glaze from "glazejs";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
 
-const Example = ({ children }) => {
-  const ref = useRef(null);
-  const isString = typeof children === "string";
-  const content = isString ? { __html: children } : null;
+export const Example = ({ children }: { children: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const refInnerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const { ScrollTrigger } = require("gsap/ScrollTrigger");
-    gsap.registerPlugin(ScrollTrigger);
-
+    if (!refInnerRef.current) return;
+    refInnerRef.current.innerHTML = children;
     glaze({
       lib: { gsap: { core: gsap } },
       element: ref.current,
@@ -22,16 +24,15 @@ const Example = ({ children }) => {
         helicopter: "from:rotate-2160|duration-5",
       },
     });
-  }, []);
+  }, [children]);
 
   return (
-    <div ref={ref} className="-mx-6">
+    <div ref={ref} suppressHydrationWarning>
       <div
-        className="flex h-max w-full items-center justify-center overflow-hidden bg-neutral-900 p-12 md:rounded-xl"
-        dangerouslySetInnerHTML={content}
+        suppressHydrationWarning
+        ref={refInnerRef}
+        className="flex h-max w-full items-center justify-center overflow-hidden bg-fd-card p-12 md:rounded-xl"
       />
     </div>
   );
 };
-
-export default Example;

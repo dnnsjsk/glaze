@@ -1,13 +1,18 @@
+// @ts-check
+import { createPreset } from "fumadocs-ui/tailwind-plugin";
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
-    "./pages/**/*.{js,jsx,ts,tsx,md,mdx}",
-    "./components/**/*.{js,jsx,ts,tsx,md,mdx}",
-    "./theme.config.tsx",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./content/**/*.{md,mdx}",
+    "./mdx-components.{ts,tsx}",
+    "./node_modules/fumadocs-ui/dist/**/*.js",
   ],
-  darkMode: "class",
-  theme: {
-    extend: {},
-  },
-  plugins: [],
+  presets: [
+    createPreset({
+      preset: "neutral",
+    }),
+  ],
 };
