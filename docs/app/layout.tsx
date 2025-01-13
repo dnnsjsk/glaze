@@ -2,12 +2,17 @@ import "./global.css";
 import { RootProvider } from "fumadocs-ui/provider";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
+import { Metadata } from "next";
 
 const inter = localFont({
   src: "../fonts/inter.woff2",
 });
 
 const socialCard = "https://glaze.dev/og.jpg";
+
+export const metadata: Metadata = {
+  title: "Glaze",
+};
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -36,7 +41,6 @@ export default function Layout({ children }: { children: ReactNode }) {
             src="https://plausible.io/js/script.js"
           />
         ) : null}
-        <title>Glaze</title>
       </head>
       <body className="flex flex-col min-h-screen" suppressHydrationWarning>
         <RootProvider>{children}</RootProvider>
