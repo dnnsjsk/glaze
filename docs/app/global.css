@@ -37,8 +37,4 @@ html {
       @apply mt-1;
     }
   }
-
-  a[data-active] {
-    @apply md:-mx-1.5;
-  }
 }
