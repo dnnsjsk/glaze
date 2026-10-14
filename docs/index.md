@@ -36,7 +36,6 @@ That's it. No JavaScript animation code, just a string that describes what you w
 - **Dot notation** - Control nested properties like `scrollTrigger.trigger-[&]` or `scale.x-2`
 - **All of GSAP** - ScrollTrigger, easing, stagger, and everything else GSAP offers
 - **Tiny footprint** - ~3kb minified and gzipped
-- **Library agnostic** - Designed to work with other animation libraries in the future (coming soon)
 
 ## How it works
 
@@ -58,7 +57,7 @@ Glaze keeps animations next to the elements they affect. You can see exactly wha
 
 ## GSAP required
 
-Glaze is a syntax layer on top of [GSAP](https://greensock.com/gsap/). You need to include GSAP in your project and pass it to Glaze during setup.
+Glaze is a syntax layer on top of [GSAP](https://gsap.com/). GSAP is the only animation library it supports. You need to install GSAP yourself and pass it to Glaze during setup (see [Getting Started](/docs/install)).
 
 GSAP has its own [licensing terms](https://gsap.com/community/standard-license/) - make sure you're compliant before using it commercially.
 

@@ -30,6 +30,8 @@ glaze({
 
 The `default` breakpoint runs when no other breakpoint is specified. If you don't set one, it defaults to `(min-width: 1px)`.
 
+`default` is the only breakpoint Glaze ships with. Every other name, such as `sm` or `lg`, works only once you define it here. A segment that uses an undefined breakpoint is ignored without a warning, so a typo like `@xl:` when only `lg` exists silently drops that animation.
+
 ## Usage
 
 Add `@breakpoint:` before your animation:
@@ -73,4 +75,4 @@ On small screens, it fades in from below. On large screens, it also scales up.
 ```
 
 
-The animations combine - larger breakpoints add to (or override) smaller ones.
+The animations combine - every breakpoint whose media query matches contributes its properties. When two matching breakpoints set the same property, the one written later in the string wins, regardless of screen size. Write breakpoints from small to large, as above, so that larger breakpoints override smaller ones.

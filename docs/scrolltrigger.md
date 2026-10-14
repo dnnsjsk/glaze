@@ -37,6 +37,21 @@ Add `scrollTrigger.*` properties to your animation:
 
 The `[&]` means "use this element as the trigger" (same as the `&` in selectors).
 
+On a standalone element, Glaze moves the `scrollTrigger` settings from the animation onto the timeline it creates for that element, so the whole animation is driven by scroll.
+
+## Inside timelines
+
+Children of a `tl` element are tweens in a shared timeline, and Glaze leaves their `scrollTrigger` settings on the tween. GSAP does not support a ScrollTrigger on a tween nested inside a timeline, so put it on the timeline element instead, using the colon form for timeline settings:
+
+```html
+<div data-animate="tl scrollTrigger:trigger-[&]|start-[top_center]">
+  <div data-animate="to:rotate-360"></div>
+  <div data-animate="to:rotate-360"></div>
+</div>
+```
+
+To scroll-trigger every element at once, set it in the [timeline defaults](/docs/defaults).
+
 ## Common options
 
 ```html
@@ -55,8 +70,6 @@ The `[&]` means "use this element as the trigger" (same as the `&` in selectors)
 </div>
 ```
 
-
-<div className="h-screen" />
 
 | Option | What it does |
 |--------|--------------|

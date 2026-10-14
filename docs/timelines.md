@@ -30,10 +30,12 @@ By design, Glaze incorporates all child elements of a timeline-declared element 
 Set defaults for the whole timeline:
 
 ```html
-<div data-animate="tl defaults:ease-elastic|duration-4 yoyo-true">
+<div data-animate="tl defaults:ease-elastic|duration-4 repeat-1 yoyo-true">
   ...
 </div>
 ```
+
+On a timeline element, the string after `tl` sets the options of the GSAP timeline itself. A plain `key-value` segment sets a top-level option (`repeat-1`, `yoyo-true`), and `key:` followed by pipe-separated values sets a nested one: `defaults:ease-elastic|duration-4` becomes `defaults: { ease: "elastic", duration: 4 }`, and `scrollTrigger:trigger-[&]` becomes `scrollTrigger: { trigger: element }`. Dot notation such as `scrollTrigger.trigger-[&]` only works inside an element's `from:` or `to:` properties.
 
 ## Timing control
 
@@ -73,7 +75,7 @@ Common timing values:
 Combine breakpoints with timelines:
 
 ```html
-<div data-animate="tl defaults:power2.inOut|duration-2">
+<div data-animate="tl defaults:ease-power2.inOut|duration-2">
   <div data-animate="to:rotate-360 @lg:to:xPercent-[50]"></div>
   <div data-animate="tl:[-=1] to:rotate-360 @lg:to:xPercent-[-50]"></div>
 </div>
@@ -81,7 +83,7 @@ Combine breakpoints with timelines:
 
 
 ```html preview
-<div class="grid gap-8" data-animate="tl defaults:power2.inOut|duration-2 scrollTrigger:trigger-[&]">
+<div class="grid gap-8" data-animate="tl defaults:ease-power2.inOut|duration-2 scrollTrigger:trigger-[&]">
   <div
     class="h-20 w-20 rounded-xl bg-amber-500"
     data-animate="to:rotate-360 @lg:to:xPercent-[100]"
@@ -101,7 +103,7 @@ The rotation always happens, but the horizontal movement only kicks in on large 
 Give your timeline a name to reference it from anywhere:
 
 ```html
-<div data-animate="tl/main defaults:power2.inOut|duration-2">
+<div data-animate="tl/main defaults:ease-power2.inOut|duration-2">
   <div data-animate="to:rotate-360"></div>
 </div>
 
@@ -116,7 +118,7 @@ Give your timeline a name to reference it from anywhere:
 <div class="grid w-full grid-cols-2 justify-items-center">
   <div
     class="grid gap-8"
-    data-animate="tl/main defaults:power2.inOut|duration-2 scrollTrigger:trigger-[&]"
+    data-animate="tl/main defaults:ease-power2.inOut|duration-2 scrollTrigger:trigger-[&]"
   >
     <div
       class="h-20 w-20 rounded-xl bg-amber-500"

@@ -59,7 +59,25 @@ If you're using class-based syntax:
 You can use presets alongside other animation strings:
 
 ```html
-<div data-animate="preset-fadeIn scrollTrigger.trigger-[&]"></div>
+<div data-animate="preset-fadeIn from:scrollTrigger.trigger-[&]"></div>
 ```
 
-Presets are just shortcuts - they expand into the full animation string before Glaze processes them.
+Every extra property still needs its state, here `from:`. A segment without one, such as a bare `scrollTrigger.trigger-[&]`, is ignored.
+
+Presets are just shortcuts - Glaze appends each preset's string to the end of the element's own string before processing it. Because the preset comes last, it wins when both set the same property: `preset-fadeIn from:duration-3` still runs for 1 second, the preset's duration.
+
+## Presets and breakpoints
+
+A preset is only recognised as the exact token `preset-<name>`, so a breakpoint modifier in front of it, such as `@md:preset-fadeIn`, does not apply the preset ([#13](https://github.com/inline0/glaze/issues/13)). Put the breakpoint into the preset's value instead:
+
+```js
+presets: {
+  fadeInMd: "@md:from:opacity-0|duration-1",
+},
+```
+
+```html
+<div data-animate="preset-fadeInMd"></div>
+```
+
+The `md` breakpoint must be defined in your config (see [Breakpoints](/docs/breakpoints)).
