@@ -1,5 +1,8 @@
 # Working in Glaze
 
+Use `AGENTS.md` as the only repository instruction filename, including nested
+guides. Keep the guidance here and do not add forwarding aliases.
+
 - Use Node 26.12.0 from `.nvmrc` and pnpm 12.14.0 from `packageManager`.
 - `pnpm run setup` installs the lockfile and Chromium. Use `pnpm verify` as the
   final gate: formatting, lint, types, unit/tooling tests, builds, browser tests
