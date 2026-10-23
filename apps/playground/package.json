@@ -1,0 +1,21 @@
+{
+  "name": "@glazejs/playground",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Interactive GSAP and Motion examples using the public Glaze package.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc-rs --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "glazejs": "workspace:*",
+    "gsap": "catalog:",
+    "motion": "catalog:"
+  },
+  "devDependencies": {
+    "vite": "catalog:"
+  }
+}

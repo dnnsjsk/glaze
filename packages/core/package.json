@@ -1,21 +1,24 @@
 {
   "name": "glazejs",
-  "version": "2.0.1",
-  "description": "Utility-based animations for the web.",
+  "version": "2.1.0",
+  "description": "Declarative animations with GSAP and Motion adapters.",
   "author": "Dennis Josek <hi@dennn.is> (https://dennn.is)",
   "homepage": "https://glaze.dev",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/inline0/glaze"
+    "url": "git+https://github.com/inline0/glaze.git",
+    "directory": "packages/core"
   },
   "bugs": {
     "url": "https://github.com/inline0/glaze/issues"
   },
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "glaze",
@@ -23,27 +26,62 @@
     "animation",
     "web",
     "utility",
-    "gsap"
+    "gsap",
+    "motion"
   ],
   "scripts": {
-    "build": "bun run test:unit && tsc && vite build && node scripts/postbuild.js",
-    "dev": "vite",
-    "release": "bun run build && npm publish",
-    "test": "bun run test:unit && bun run test:e2e",
-    "test:e2e": "bunx playwright test",
-    "test:unit": "vitest --watch=false --config vitest.config.unit.ts",
-    "test:unit-watch": "vitest --watch=true --config vitest.config.unit.ts"
+    "build": "vite build && node scripts/prepare-package.ts",
+    "typecheck": "tsc-rs --noEmit -p tsconfig.json",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "prepack": "pnpm build"
   },
   "devDependencies": {
-    "@playwright/test": "^1.57.0",
-    "@types/node": "^25.0.9",
-    "gsap": "^3.14.2",
-    "jsdom": "^27.4.0",
-    "prettier": "^3.8.0",
-    "terser": "^5.46.0",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.4",
-    "vitest": "^4.0.17"
+    "@glazejs/shared": "workspace:*",
+    "@glazejs/gsap": "workspace:*",
+    "@glazejs/motion": "workspace:*",
+    "gsap": "catalog:",
+    "jsdom": "catalog:",
+    "motion": "catalog:",
+    "rolldown-plugin-dts": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "type": "module",
+  "main": "./dist/index.es.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "default": "./dist/index.es.js"
+    },
+    "./gsap": {
+      "types": "./dist/gsap.d.ts",
+      "import": "./dist/gsap.es.js",
+      "default": "./dist/gsap.es.js"
+    },
+    "./motion": {
+      "types": "./dist/motion.d.ts",
+      "import": "./dist/motion.es.js",
+      "default": "./dist/motion.es.js"
+    },
+    "./dist/index.es.js": "./dist/index.es.js",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "peerDependencies": {
+    "gsap": "^3.15.0",
+    "motion": "^14.6.0"
+  },
+  "peerDependenciesMeta": {
+    "gsap": {
+      "optional": true
+    },
+    "motion": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

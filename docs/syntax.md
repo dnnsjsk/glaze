@@ -40,7 +40,7 @@ Animate from the current state to these values:
 
 ### fromTo
 
-Use both to animate between two specific states ([fromTo in GSAP](https://gsap.com/docs/v3/GSAP/gsap.fromTo())):
+Use both to animate between two specific states ([fromTo in GSAP](<https://gsap.com/docs/v3/GSAP/gsap.fromTo()>)):
 
 ```html
 <div data-animate="from:opacity-0.5 to:opacity-1"></div>
@@ -121,7 +121,9 @@ You can combine selectors with breakpoints:
 Here's a complex example:
 
 ```html
-<div data-animate="@lg:[&>div]:from:opacity-0|y-50|stagger-0.1|duration-0.5|ease-power2.out">
+<div
+  data-animate="@lg:[&>div]:from:opacity-0|y-50|stagger-0.1|duration-0.5|ease-power2.out"
+>
   <div>Card 1</div>
   <div>Card 2</div>
   <div>Card 3</div>

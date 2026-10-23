@@ -10,59 +10,70 @@ meta_description: "Set global animation defaults"
 
 # Defaults
 
-Set default animation values that apply to all timelines, and with them to every animated element.
-
-## Setup
-
-```js
-glaze({
-  lib: { gsap: { core: gsap } },
-  defaults: {
-    tl: "defaults:ease-power2.inOut|duration-1 scrollTrigger:trigger-[&]",
-  },
-});
-```
-
-## Timeline defaults
-
-The `tl` default applies to every timeline:
-
-```js
-defaults: {
-  tl: "defaults:ease-power2.inOut|duration-1 scrollTrigger:trigger-[&]",
-}
-```
-
-Now every element with a timeline will automatically:
-- Use `power2.inOut` easing
-- Run for 1 second unless the element sets its own `duration`
-- Trigger its animation when scrolled into view (this needs [ScrollTrigger](/docs/scrolltrigger) registered)
-
-The `tl` string uses the same syntax as a `tl` attribute (see [Timelines](/docs/timelines)). Nested timeline settings use a colon: `scrollTrigger:trigger-[&]` sets `scrollTrigger.trigger`. The dot form `scrollTrigger.trigger-[&]` that works inside an element's animation does not work here, it creates a setting literally named `scrollTrigger.trigger` and no ScrollTrigger.
-
-The `[&]` resolves to the element that owns the timeline, so each element triggers its own animation.
+Apply default values once in the same `glaze()` call as the engine configuration.
+An element's own utilities override matching defaults.
 
 ## Element defaults
 
-The config also accepts `defaults.element`, but it currently has no reliable effect ([#16](https://github.com/inline0/glaze/issues/16)):
+Bare properties apply to every existing `from` or `to` animation state:
 
-- A value without a state, such as `element: "duration-1"`, is ignored.
-- A value with a state, such as `element: "from:duration-1"`, is applied after the element's own values, so it overrides them instead of acting as a default, and it adds that state to every element.
-
-To set a default duration or ease, use `defaults.tl` with `defaults:` as shown above.
-
-## How it works
-
-Glaze creates a timeline for each element internally, even if you don't explicitly use `tl`. This means `tl` defaults effectively apply to everything - useful for setting up global ScrollTrigger behavior or easing.
-
-Values inside `defaults:` become the [defaults](https://gsap.com/docs/v3/GSAP/Timeline#defaults) of each GSAP timeline, so an element can always override them:
+```ts
+glaze({
+  lib: { gsap: { core: gsap } },
+  defaults: { element: "duration-1|ease-power2.inOut" },
+})
+```
 
 ```html
-<!-- Uses the default 1s duration -->
+<!-- Uses a one-second duration and the default easing. -->
 <div data-animate="from:opacity-0"></div>
 
-<!-- Overrides to 0.5s -->
+<!-- Explicit values win over defaults. -->
 <div data-animate="from:opacity-0|duration-0.5"></div>
 ```
 
-A timeline element that sets its own `defaults:` replaces the configured `defaults:` values it repeats and keeps the rest.
+State-specific defaults apply only to that state:
+
+```ts
+defaults: {
+  element: "duration-1 from:opacity-0 to:ease-linear",
+}
+```
+
+A `to` animation receives the common duration and `to` easing, but no `from`
+state is added. Defaults never create an animation state that the element did
+not request. For a `from`/`to` animation, common defaults apply to both states,
+then state-specific defaults, then the element's explicit values.
+
+The older `elementSettings` configuration key remains a common-default alias.
+Prefer `element` in new code; `element` wins when both specify the same value.
+
+## Timeline defaults
+
+Use `defaults.tl` for settings on every timeline:
+
+```ts
+glaze({
+  lib: { gsap: { core: gsap } },
+  defaults: {
+    tl: "defaults:ease-power2.inOut|duration-1",
+  },
+})
+```
+
+Glaze creates a timeline even for standalone animated elements. Values under
+`defaults:` are passed to the engine's timeline defaults. Element properties
+still take precedence. A timeline's own settings override configured values
+while retaining defaults it does not replace.
+
+Timeline settings use a colon for nested properties:
+
+```ts
+defaults: {
+  tl: "defaults:duration-1 scrollTrigger:trigger-[&]",
+}
+```
+
+Here `[&]` resolves to the timeline's owning element. ScrollTrigger requires
+GSAP and a registered [ScrollTrigger plugin](/docs/scrolltrigger). The Motion
+adapter rejects GSAP-only settings explicitly.

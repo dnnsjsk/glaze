@@ -10,26 +10,21 @@ meta_description: "Reusable animation presets"
 
 # Presets
 
-You can create presets for your animations to apply the same settings to multiple elements. This is useful when you want consistent animations across your site.
+Presets are named animation strings expanded where you reference them.
 
 ## Setup
 
-Define presets in your config:
-
-```js
+```ts
 glaze({
   lib: { gsap: { core: gsap } },
+  breakpoints: { md: "(min-width: 768px)" },
   presets: {
     fadeIn: "from:opacity-0|duration-1",
-    slideUp: "from:y-50|opacity-0|duration-0.5",
+    slideUp: "preset-fadeIn from:y-50|duration-0.5",
     helicopter: "from:rotate-2160|duration-5",
   },
-});
+})
 ```
-
-## Usage
-
-Reference presets with `preset-`:
 
 ```html
 <div data-animate="preset-fadeIn"></div>
@@ -37,47 +32,49 @@ Reference presets with `preset-`:
 <div data-animate="preset-helicopter"></div>
 ```
 
+## Overrides and composition
 
-```html preview
-<div
-    class="h-20 w-20 rounded-xl bg-amber-500"
-    data-animate="preset-helicopter"
-  ></div>
-```
-
-
-## With classes
-
-If you're using class-based syntax:
+Presets expand inline. Later values for the same state and property win:
 
 ```html
-<div class="animate-preset-helicopter h-20 w-20 rounded-xl bg-amber-500"></div>
+<!-- Override the preset's one-second duration. -->
+<div data-animate="preset-fadeIn from:duration-3"></div>
+
+<!-- The later preset wins and uses one second. -->
+<div data-animate="from:duration-3 preset-fadeIn"></div>
 ```
 
-## Combining presets
+Every additional property needs its state, such as `from:duration-3`. A preset
+can reference another preset, as `slideUp` does above. Circular references throw
+an error identifying the cycle instead of recursing forever.
 
-You can use presets alongside other animation strings:
+## Responsive presets
+
+Prefix a preset with a configured breakpoint:
 
 ```html
-<div data-animate="preset-fadeIn from:scrollTrigger.trigger-[&]"></div>
+<div data-animate="@md:preset-helicopter"></div>
 ```
 
-Every extra property still needs its state, here `from:`. A segment without one, such as a bare `scrollTrigger.trigger-[&]`, is ignored.
+The `md` media query applies to the expanded utilities, including nested presets.
+An outer breakpoint modifier takes precedence over breakpoint modifiers inside
+the preset. Without an outer modifier, a preset keeps its own modifiers:
 
-Presets are just shortcuts - Glaze appends each preset's string to the end of the element's own string before processing it. Because the preset comes last, it wins when both set the same property: `preset-fadeIn from:duration-3` still runs for 1 second, the preset's duration.
-
-## Presets and breakpoints
-
-A preset is only recognised as the exact token `preset-<name>`, so a breakpoint modifier in front of it, such as `@md:preset-fadeIn`, does not apply the preset ([#13](https://github.com/inline0/glaze/issues/13)). Put the breakpoint into the preset's value instead:
-
-```js
+```ts
 presets: {
-  fadeInMd: "@md:from:opacity-0|duration-1",
-},
+  responsiveRise: "from:opacity-0 @md:from:y-50",
+}
 ```
+
+See [Breakpoints](/docs/breakpoints) for media-query configuration.
+
+## Class syntax
+
+With `className: "animate"`, the same presets work in classes:
 
 ```html
-<div data-animate="preset-fadeInMd"></div>
+<div class="animate-preset-fadeIn"></div>
+<div class="animate-@md:preset-helicopter"></div>
 ```
 
-The `md` breakpoint must be defined in your config (see [Breakpoints](/docs/breakpoints)).
+The alternate responsive prefix `@md:animate-preset-helicopter` is also supported.

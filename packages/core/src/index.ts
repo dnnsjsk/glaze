@@ -1,264 +1,510 @@
+import { createGsapAdapter } from "@glazejs/gsap"
 import type {
-  GlazeAnimationCollection,
+  AnimationMedia,
+  AnimationTargets,
+  AnimationTimeline,
+  AnimationValues,
+} from "@glazejs/shared"
+import type {
   GlazeAnimationObject,
   GlazeConfig,
+  GlazeInstance,
+  GlazeState,
   GlazeTimeline,
-  PlainObject,
-} from "@/types.ts";
-import getSelectorOrElement from "@/utils/getSelectorOrElement.ts";
-import mergeDeep from "@/utils/mergeDeep.ts";
-import parseToObject from "@/utils/parseToObject.ts";
-import parseTimeline from "@/utils/parseTimeline.ts";
-import parseMediaQueries from "@/utils/parseMediaQueries.ts";
-import debounce from "@/utils/debounce.ts";
+} from "./types.ts"
+import applyDefaults from "./utils/applyDefaults.ts"
+import expandPresets from "./utils/expandPresets.ts"
+import getSelectorOrElement from "./utils/getSelectorOrElement.ts"
+import isObject from "./utils/isObject.ts"
+import mergeDeep from "./utils/mergeDeep.ts"
+import parseMediaQueries from "./utils/parseMediaQueries.ts"
+import parseTimeline from "./utils/parseTimeline.ts"
+import parseToObject from "./utils/parseToObject.ts"
 
-function glaze(config: GlazeConfig) {
-  if (!config || !config?.lib?.gsap?.core) {
-    throw new Error("GSAP not found");
+/**
+ * Animate declarative utilities with GSAP or an explicit animation adapter.
+ * @param config - Engine, root element, defaults and responsive options.
+ * @returns The running instance; destroy it when its DOM is unmounted.
+ */
+function glaze<Timeline extends AnimationTimeline = AnimationTimeline>(
+  config: GlazeConfig<Timeline>
+): GlazeInstance<Timeline> {
+  if (!config || (!config.adapter && !config.lib?.gsap?.core)) {
+    throw new Error(
+      "GSAP not found. Provide lib.gsap.core or an animation adapter."
+    )
   }
-
-  const {
-    lib: {
-      gsap: { core: gsap },
-    },
-    ...rest
-  } = config;
-
-  const state = mergeDeep(
-    {
-      breakpoints: { default: "(min-width: 1px)" },
-      dataAttribute: "data-animate",
-      element: document,
-      watch: false,
-    },
-    rest,
-  ) as Omit<GlazeConfig, "gsap"> & {
-    dataAttribute: string;
-    element: Document | Element;
+  const adapter = config.adapter ?? createGsapAdapter(config.lib.gsap.core)
+  const { adapter: _adapter, lib: _lib, ...options } = config
+  const state: GlazeState = {
+    ...options,
+    dataAttribute: options.dataAttribute ?? "data-animate",
+    element: options.element ?? document,
+    watch: options.watch ?? false,
     breakpoints: {
-      default: string;
-      [key: string]: string;
-    };
-  };
-
-  let idCounter = 0;
-  const defaultBp = state.breakpoints?.default;
-  const breakpoints = state.breakpoints;
-  const timelines: GlazeTimeline[] = [];
-
-  const getAttributeString = (withBrackets = false) =>
-    `${withBrackets ? "[" : ""}${state.dataAttribute}${withBrackets ? "]" : ""}`;
-
-  const getClassnameString = () =>
-    state.className
-      ? `, [class^="${state.className}"], [class*="${state.className}"]`
-      : "";
-
-  const getAttribute = (element: Element) => {
-    const attribute = element.getAttribute(getAttributeString()) || "";
-    let classes = "";
-    if (state?.className) {
-      const className = element.getAttribute("class") || "";
-      const classNameArray = className.split(" ");
-      classes = classNameArray
-        .filter((c) => c.includes(<string>state.className))
-        .map((c) => c.replace(`${state?.className}-`, ""))
-        .join(" ");
-    }
-
-    let presets = "";
-    const allStrings = `${attribute} ${classes}`.trim();
-
-    if (state?.presets) {
-      Object.entries(state.presets).forEach(([key, value]) => {
-        allStrings.split(" ").forEach((str) => {
-          if (str === `preset-${key}`) presets += ` ${value}`;
-        });
-      });
-      presets = presets.trim();
-    }
-
-    return `${allStrings} ${presets}`.trim();
-  };
-
-  const getElements = (element: Document | Element = state.element) =>
-    Array.from(
-      element.querySelectorAll(
-        `${getAttributeString(true)}${getClassnameString()}`,
+      default: "(min-width: 1px)",
+      ...Object.fromEntries(
+        Object.entries(options.breakpoints ?? {}).filter(
+          (entry): entry is [string, string] => typeof entry[1] === "string"
+        )
       ),
-    );
+    },
+  }
+  const breakpoints = state.breakpoints
+  const defaultBp = breakpoints.default
+  const timelines: GlazeTimeline<Timeline>[] = []
+  const originalStyles = new Map<Element, string | null>()
+  const utilityCache = new Map<Element, string>()
+  const wrappers = new Set<GlazeTimeline<Timeline>>()
+  const engineSettings = new Map<GlazeTimeline<Timeline>, AnimationValues>()
+  let rendered = false
+  let media: AnimationMedia | undefined
+  let observer: MutationObserver | undefined
+  let timer: ReturnType<typeof setTimeout> | undefined
+  let destroyed = false
+  let idCounter = 0
+  const getId = () => `glaze-${++idCounter}`
+  const matchesTimeline = (attribute: string) =>
+    /^(?:@[\w-]+:)?tl(?:\/[\w-]+)?$/.test(attribute)
 
-  const getId = () => {
-    idCounter++;
-    return `${Math.random().toString(36).substring(2, 15)}-${idCounter}`;
-  };
-
-  const matchesTl = (attr: string) =>
-    attr === "tl" || attr.includes("tl/") || attr.endsWith(":tl");
-
-  const findTimelineById = (id: string) =>
-    timelines.find((timeline) => timeline.id === id);
-
-  const findTimelineByElements = (element: Element) =>
-    timelines.find((timeline) => timeline.elements.has(element));
-
-  const findTimelineByTimelineElement = (element: Element) =>
-    timelines.find(
-      (timeline) =>
-        timeline.timelineElement === element ||
-        (timeline.timelineElement.id &&
-          element.id &&
-          timeline.timelineElement.id === element.id),
-    );
-
-  const addOrReplaceTimeline = (timeline: GlazeTimeline) => {
-    const id = timeline.id;
-    const index = timelines.findIndex((timeline) => timeline.id === id);
-
-    if (id && index !== -1) {
-      timelines[index] = {
-        ...timeline,
-        timeline: timelines[index].timeline,
-      };
-      return;
-    }
-
-    timelines.push(timeline);
-  };
-
-  function findClosestMatchingAncestor(element: Element): Element | null {
-    let currentElement = element.parentElement;
-
-    while (currentElement) {
-      if (currentElement.hasAttribute(state.dataAttribute)) {
-        return currentElement;
-      }
-      const classList = Array.from(currentElement.classList);
-      const hasMatchingClass = classList.some((className) =>
-        className.startsWith(state.className || ""),
-      );
-      if (hasMatchingClass && state.watch) return currentElement;
-      currentElement = currentElement.parentElement;
-    }
-
-    return null;
+  /**
+   * Combine attribute and class utilities before expanding presets.
+   * @param element - The element holding utility tokens.
+   * @returns Expanded utilities in source order.
+   */
+  function getAttribute(element: Element) {
+    const cached = utilityCache.get(element)
+    if (cached !== undefined) return cached
+    const attribute = element.getAttribute(state.dataAttribute) ?? ""
+    const classes = state.className
+      ? Array.from(element.classList)
+          .map((name) => {
+            const prefix = `${state.className}-`
+            if (name.startsWith(prefix)) return name.slice(prefix.length)
+            const responsive = name.match(/^(@[\w-]+:)(.*)$/)
+            if (responsive?.[2]?.startsWith(prefix))
+              return responsive[1] + responsive[2].slice(prefix.length)
+            return ""
+          })
+          .filter(Boolean)
+          .join(" ")
+      : ""
+    const utilities = expandPresets(`${attribute} ${classes}`, state.presets)
+    utilityCache.set(element, utilities)
+    return utilities
   }
 
-  function shouldMutate(element: Element) {
-    const newData = getTimelineElement(element);
-    const oldData = timelines
-      .find((timeline) => {
-        return timeline.elements.has(element);
-      })
-      ?.elements.get(element);
-    if (JSON.stringify(newData) === JSON.stringify(oldData)) return false;
+  /**
+   * Identify elements participating in this instance.
+   * @param element - The candidate element.
+   * @returns Whether the attribute or configured class prefix is present.
+   */
+  function isAnimated(element: Element) {
     return (
-      !oldData ||
-      !newData ||
-      JSON.stringify(newData) !== JSON.stringify(oldData)
-    );
+      element.hasAttribute(state.dataAttribute) ||
+      Boolean(
+        state.className &&
+        Array.from(element.classList).some(
+          (name) =>
+            name.startsWith(`${state.className}-`) ||
+            new RegExp(
+              `^@[\\w-]+:${escapeRegExp(state.className ?? "")}-`
+            ).test(name)
+        )
+      )
+    )
   }
 
-  const debouncedHandleMutation = debounce(
-    handleMutation,
-    typeof state.watch === "object" ? state.watch.debounceTime || 500 : 500,
-  );
+  /**
+   * Collect matching descendants, including an animated root element.
+   * @param root - The subtree to inspect.
+   * @returns Animated elements in document order.
+   */
+  function getElements(root: Document | Element = state.element) {
+    const elements = Array.from(root.querySelectorAll("*"))
+    if (root instanceof Element && isAnimated(root)) elements.unshift(root)
+    return elements.filter(isAnimated)
+  }
 
-  function handleMutation(element: Element) {
-    const timeline = findTimelineByElements(element);
+  /**
+   * Parse an element's utilities without applying defaults prematurely.
+   * @param element - The source element.
+   * @returns Parsed animation states grouped by media query.
+   */
+  function getElementData(
+    element: Element
+  ): Record<string, GlazeAnimationObject> {
+    return Object.fromEntries(
+      Object.entries(
+        parseMediaQueries(getAttribute(element), breakpoints, defaultBp)
+      ).map(([breakpoint, parts]) => [
+        breakpoint,
+        parseToObject(parts.join(" "), false, element),
+      ])
+    )
+  }
 
-    if (!timeline?.timeline) {
-      let otherTimelineId = "";
-      Object.values(getTimelineElement(element)).forEach((data) => {
-        if (otherTimelineId) return;
-        if (data.tl) {
-          otherTimelineId = Object.keys(data.tl)[0];
-        }
-      });
+  /**
+   * Apply shared timeline defaults before explicit wrapper settings.
+   * @param element - The source for relative selector values.
+   * @param values - Explicit timeline settings.
+   * @returns Merged timeline settings.
+   */
+  function timelineOptions(element: Element, values: AnimationValues) {
+    return mergeDeep(
+      {},
+      state.defaults?.tl ? parseToObject(state.defaults.tl, true, element) : {},
+      values
+    )
+  }
 
-      if (!otherTimelineId) {
-        otherTimelineId = findTimelineByTimelineElement(element)?.id || "";
-      }
+  /**
+   * Keep active tokens in source order, including interleaved breakpoints.
+   * @param element - The element with cached utility tokens.
+   * @param conditions - Currently matching media queries.
+   * @returns Active tokens with breakpoint and timeline markers removed.
+   */
+  function activeUtilities(
+    element: Element,
+    conditions: Record<string, boolean>
+  ) {
+    return getAttribute(element)
+      .split(/\s+/)
+      .flatMap((token) => {
+        const match = token.match(/^@([\w-]+):/)
+        const query = match ? breakpoints[match[1]] : defaultBp
+        if (!query || !conditions[query] || matchesTimeline(token)) return []
+        return [match ? token.slice(match[0].length) : token]
+      })
+      .join(" ")
+  }
 
-      if (!otherTimelineId) {
-        start([element], getId());
-        return;
-      }
-
-      const otherTimeline = findTimelineById(otherTimelineId);
-      const otherTimelineElements = [
-        otherTimeline?.timelineElement,
-        ...(otherTimeline?.elements.keys() || []),
-        element,
-      ] as Element[];
-      otherTimeline?.timeline.progress(0).clear();
-      start(otherTimelineElements, otherTimelineId);
-      return;
+  function collect() {
+    const elements = getElements()
+    const owners = new Map<
+      Element,
+      NonNullable<ReturnType<typeof parseTimeline>>
+    >()
+    const named = new Map<string, Element>()
+    for (const element of elements) {
+      const data = getAttribute(element)
+      if (!data.split(/\s+/).some(matchesTimeline)) continue
+      const metadata = parseTimeline(data, breakpoints, defaultBp)
+      if (!metadata) continue
+      owners.set(element, metadata)
+      if (metadata.id) named.set(metadata.id, element)
     }
-
-    start(
-      [
-        ...Array.from(timeline.elements.keys()),
-        ...(timeline?.timelineElement ? [timeline?.timelineElement] : []),
-      ],
-      timeline?.id || "",
-    );
+    const memberships = new Map<Element, Element>()
+    for (const element of elements) {
+      if (owners.has(element)) continue
+      const linked = getAttribute(element)
+        .split(/\s+/)
+        .map(
+          (token) =>
+            token
+              .replace(/^@[\w-]+:/, "")
+              .match(/^tl:([\w-]+?)(?:-\[.*\])?$/)?.[1]
+        )
+        .find((id) => id !== undefined && named.has(id))
+      if (linked) {
+        const owner = named.get(linked)
+        if (owner) memberships.set(element, owner)
+        continue
+      }
+      for (
+        let ancestor = element.parentElement;
+        ancestor;
+        ancestor = ancestor.parentElement
+      ) {
+        if (owners.has(ancestor)) {
+          memberships.set(element, ancestor)
+          break
+        }
+      }
+    }
+    for (const [element, metadata] of owners) {
+      const data = timelineOptions(
+        element,
+        parseToObject(
+          getAttribute(element)
+            .split(/\s+/)
+            .filter((token) => !matchesTimeline(token))
+            .join(" "),
+          true,
+          element
+        )
+      )
+      const { scrollTrigger: _trigger, ...initialSettings } = data
+      const timeline: GlazeTimeline<Timeline> = {
+        breakpoint: metadata.breakpoint,
+        data,
+        elements: new Map(
+          elements
+            .filter((candidate) => memberships.get(candidate) === element)
+            .map((candidate) => [candidate, getElementData(candidate)])
+        ),
+        id: metadata.id || getId(),
+        timelineElement: element,
+        timeline: adapter.createTimeline({ ...initialSettings, paused: true }),
+      }
+      wrappers.add(timeline)
+      engineSettings.set(timeline, initialSettings)
+      timelines.push(timeline)
+    }
+    for (const element of elements) {
+      if (owners.has(element) || memberships.has(element)) continue
+      const data = timelineOptions(element, {})
+      const { scrollTrigger: _trigger, ...initialSettings } = data
+      const timeline: GlazeTimeline<Timeline> = {
+        breakpoint: defaultBp,
+        data: {},
+        elements: new Map([[element, getElementData(element)]]),
+        id: getId(),
+        timelineElement: element,
+        timeline: adapter.createTimeline({ ...initialSettings, paused: true }),
+      }
+      engineSettings.set(timeline, initialSettings)
+      timelines.push(timeline)
+    }
   }
 
-  function watch() {
-    const target = state.element;
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        const isAttribute =
-          mutation.type === "attributes" &&
-          mutation.attributeName === state.dataAttribute;
-        const isClass =
-          state.className &&
-          mutation.attributeName === "class" &&
-          (mutation.target as Element)
-            .getAttribute("class")
-            ?.includes(state.className);
+  /**
+   * Resolve targets so their original inline styles can be retained.
+   * @param targets - Targets accepted by the selected backend.
+   * @returns The affected DOM elements.
+   */
+  function targetElements(targets: AnimationTargets) {
+    if (typeof targets === "string") {
+      const document = state.element.ownerDocument ?? state.element
+      return Array.from(document.querySelectorAll(targets))
+    }
+    return targets instanceof Element ? [targets] : Array.from(targets)
+  }
 
-        if (!isAttribute && !isClass && mutation.type !== "childList") return;
+  /**
+   * Save styles once before any backend mutates an element.
+   * @param targets - Targets whose original styles should be retained.
+   */
+  function rememberTargets(targets: AnimationTargets) {
+    for (const element of targetElements(targets)) {
+      if (!originalStyles.has(element))
+        originalStyles.set(element, element.getAttribute("style"))
+    }
+  }
 
-        if (mutation.type === "childList") {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              const element = node as Element;
-              if (
-                element.hasAttribute(state.dataAttribute) ||
-                (state.className &&
-                  element.getAttribute("class")?.includes(state.className))
-              ) {
-                if (!shouldMutate(element)) return;
-                console.log("mutation - childList: attribute/class change");
-                debouncedHandleMutation(element);
-                return;
-              } else {
-                const closestMatchingAncestor =
-                  findClosestMatchingAncestor(element);
-                if (!closestMatchingAncestor) return;
-                if (closestMatchingAncestor) {
-                  console.log(
-                    "mutation - childList: closest matching ancestor",
-                  );
-                  debouncedHandleMutation(closestMatchingAncestor);
-                  return;
-                }
+  function restoreStyles() {
+    for (const [element, style] of originalStyles) {
+      adapter.reset?.(element)
+      if (style === null) element.removeAttribute("style")
+      else element.setAttribute("style", style)
+    }
+  }
+
+  /**
+   * Rebuild each timeline using only currently matching variants.
+   * @param conditions - Active media query results from the backend.
+   * @returns Cleanup to run before another media state is rendered.
+   */
+  function render(conditions: Record<string, boolean>) {
+    for (const timeline of timelines) {
+      timeline.timeline.pause?.()
+      timeline.timeline.progress(0)
+      timeline.timeline.clear()
+    }
+    restoreStyles()
+    for (const timeline of timelines) {
+      const active = Boolean(conditions[timeline.breakpoint])
+      const animations = new Map<Element, GlazeAnimationObject>()
+      const standaloneData: AnimationValues = {}
+      if (active)
+        for (const element of timeline.elements.keys()) {
+          const animation = applyDefaults(
+            parseToObject(activeUtilities(element, conditions), false, element),
+            state.defaults,
+            element
+          )
+          if (!wrappers.has(timeline))
+            for (const name of ["from", "to"] as const) {
+              const values = animation[name]
+              if (values && Object.hasOwn(values, "scrollTrigger")) {
+                standaloneData.scrollTrigger = values.scrollTrigger
+                delete values.scrollTrigger
               }
             }
-          });
-
-          return;
+          animations.set(element, animation)
         }
+      const settings = timelineOptions(
+        timeline.timelineElement,
+        wrappers.has(timeline)
+          ? parseToObject(
+              activeUtilities(timeline.timelineElement, conditions),
+              true,
+              timeline.timelineElement
+            )
+          : standaloneData
+      )
+      if (!active) delete settings.scrollTrigger
+      if (rendered || !sameSettings(engineSettings.get(timeline), settings)) {
+        timeline.timeline.kill?.()
+        timeline.timeline = adapter.createTimeline({
+          ...settings,
+          paused: true,
+        })
+      }
+      engineSettings.set(timeline, settings)
+      timeline.data = wrappers.has(timeline) ? settings : standaloneData
+      if (!active) continue
+      for (const [element, values] of animations) {
+        if (!values.from && !values.to) continue
+        const targets = getSelectorOrElement(element, values)
+        if (targets === null) continue
+        rememberTargets(targets)
+        const position = values.tl ? Object.values(values.tl)[0] : undefined
+        const at =
+          typeof position === "string" || typeof position === "number"
+            ? position
+            : undefined
+        if (values.from && values.to)
+          timeline.timeline.fromTo(targets, values.from, values.to, at)
+        else if (values.to) timeline.timeline.to(targets, values.to, at)
+        else if (values.from) timeline.timeline.from(targets, values.from, at)
+      }
+      if (timeline.timeline.scrollTrigger?.isActive !== false)
+        timeline.timeline.restart()
+    }
+    rendered = true
+    return () => {
+      for (const timeline of timelines) {
+        timeline.timeline.pause?.()
+        timeline.timeline.progress(0)
+        timeline.timeline.clear()
+      }
+      restoreStyles()
+    }
+  }
 
-        if (!shouldMutate(mutation.target as Element)) return;
-        console.log("mutation - attribute/class change");
-        debouncedHandleMutation(mutation.target as Element);
-      });
-    });
+  function disposeAnimations() {
+    media?.revert?.()
+    media = undefined
+    for (const timeline of timelines) timeline.timeline.kill?.()
+    restoreStyles()
+    originalStyles.clear()
+    utilityCache.clear()
+    wrappers.clear()
+    engineSettings.clear()
+    rendered = false
+    timelines.length = 0
+  }
 
-    const mutationConfig = {
+  function refresh() {
+    if (destroyed) return
+    if (timer !== undefined) clearTimeout(timer)
+    timer = undefined
+    disposeAnimations()
+    try {
+      collect()
+      media = adapter.createMedia()
+      media.add(
+        Object.fromEntries(
+          Object.values(breakpoints).map((query) => [query, query])
+        ),
+        (context) => {
+          try {
+            return render(context.conditions ?? {})
+          } catch (error) {
+            destroy()
+            throw error
+          }
+        }
+      )
+    } catch (error) {
+      destroy()
+      throw error
+    }
+  }
+
+  function destroy() {
+    if (destroyed) return
+    destroyed = true
+    observer?.disconnect()
+    if (timer !== undefined) clearTimeout(timer)
+    timer = undefined
+    disposeAnimations()
+  }
+
+  /**
+   * Check added, removed and reclassified nodes for animation relevance.
+   * @param node - The changed DOM node or subtree.
+   * @returns Whether this subtree contains an input or animation target.
+   */
+  function relevantNode(node: Node) {
+    if (!(node instanceof Element)) return false
+    const related = (element: Element) =>
+      utilityCache.has(element) ||
+      originalStyles.has(element) ||
+      isAnimated(element)
+    if (related(node) || Array.from(node.querySelectorAll("*")).some(related))
+      return true
+    for (const timeline of timelines)
+      for (const [source, variants] of timeline.elements) {
+        for (const values of Object.values(variants)) {
+          if (!values.selector) continue
+          const targets = getSelectorOrElement(source, values)
+          if (
+            targets &&
+            targetElements(targets).some(
+              (element) => element === node || node.contains(element)
+            )
+          )
+            return true
+        }
+      }
+    return false
+  }
+
+  /**
+   * Include descendant mutations that change a relative selector's targets.
+   * @param node - The parent whose descendants changed.
+   * @returns Whether an animated relative-selector root contains the node.
+   */
+  function relativeSelectorParent(node: Node) {
+    for (const timeline of timelines)
+      for (const [source, variants] of timeline.elements) {
+        if (source !== node && !source.contains(node)) continue
+        if (
+          Object.values(variants).some((values) =>
+            values.selector?.value?.startsWith("&")
+          )
+        )
+          return true
+      }
+    return false
+  }
+
+  refresh()
+  if (state.watch) {
+    const wait =
+      typeof state.watch === "object" ? (state.watch.debounceTime ?? 500) : 500
+    observer = new MutationObserver((mutations) => {
+      const relevant = mutations.some((mutation) => {
+        if (mutation.type === "attributes")
+          return (
+            mutation.attributeName === state.dataAttribute ||
+            relevantNode(mutation.target) ||
+            relativeSelectorParent(mutation.target)
+          )
+        const nodes = [...mutation.addedNodes, ...mutation.removedNodes]
+        return (
+          nodes.some(relevantNode) ||
+          (nodes.some((node) => node instanceof Element) &&
+            relativeSelectorParent(mutation.target))
+        )
+      })
+      if (!relevant) return
+      if (timer !== undefined) clearTimeout(timer)
+      timer = setTimeout(refresh, wait)
+    })
+    observer.observe(state.element, {
       attributes: true,
       attributeFilter: [
         state.dataAttribute,
@@ -266,269 +512,37 @@ function glaze(config: GlazeConfig) {
       ],
       subtree: true,
       childList: true,
-    };
-
-    observer.observe(target, mutationConfig);
+    })
   }
-
-  function getTimelineElement(element: Element) {
-    const data = [
-      ...Object.entries(
-        parseMediaQueries(getAttribute(element), breakpoints, defaultBp),
-      ).map(([key, value]) => ({
-        breakpoint: key,
-        element,
-        data: parseToObject(value.join(" "), false, element),
-      })),
-    ];
-
-    const bps: {
-      [key: string]: GlazeAnimationObject;
-    } = {};
-    data.forEach((el) => {
-      if (!bps?.[el.breakpoint]) bps[el.breakpoint] = {};
-      bps[el.breakpoint] = el.data;
-    });
-
-    return bps;
-  }
-
-  function getTimeline(element: Element, id = "") {
-    const processedElements: Element[] = [];
-    const data = getAttribute(element);
-    const attributes = data.split(" ");
-
-    if (attributes.some((attr) => matchesTl(attr))) {
-      const timelineData = parseTimeline(data, breakpoints, defaultBp);
-      const elements = new Map<Element, GlazeAnimationObject>();
-      [
-        ...getElements(element),
-        ...(timelineData?.id
-          ? state.element.querySelectorAll(
-              `[${state.dataAttribute}*="tl:${timelineData.id}"]${
-                state.className
-                  ? `, [class^="${state.className}-tl:${timelineData.id}"], [class*="${state.className}-tl:${timelineData.id}"]`
-                  : ""
-              }`,
-            )
-          : []),
-      ].forEach((el) => {
-        if (el === element) return;
-
-        elements.set(el, getTimelineElement(el));
-        processedElements.push(el);
-      });
-
-      const parsedData = parseToObject(
-        attributes.filter((attr) => !matchesTl(attr)).join(" "),
-        true,
-        element,
-      );
-
-      let defaults = {};
-      if (state.defaults?.tl) {
-        defaults = parseToObject(state.defaults.tl, true, element);
-      }
-
-      const mergedData = {};
-      mergeDeep(mergedData, defaults, parsedData);
-
-      const timelineBp = timelineData?.breakpoint || defaultBp;
-      addOrReplaceTimeline({
-        breakpoint: timelineBp,
-        data: mergedData,
-        elements,
-        id: id || timelineData?.id || getId(),
-        timelineElement: element,
-        timeline: gsap.timeline({ ...mergedData, paused: true }),
-      });
-    }
-
-    return processedElements;
-  }
-
-  function collect(els = getElements(), id = "") {
-    const processedElements: Element[] = [];
-
-    els.forEach((element) => {
-      const data = getAttribute(element);
-      const attributes = data.split(" ");
-
-      if (attributes.some((attr) => matchesTl(attr))) {
-        processedElements.push(...getTimeline(element));
-        processedElements.push(element);
-      }
-    });
-
-    els.forEach((element) => {
-      if (processedElements.includes(element)) return;
-      const timelineMatchMedia = timelines.find(
-        (timeline) => timeline.elements?.has(element) && timeline.breakpoint,
-      )?.breakpoint;
-
-      const timeline = findTimelineByElements(element);
-      const elements = new Map<Element, GlazeAnimationObject>();
-
-      if (!timeline || id !== "") {
-        const elementData = getTimelineElement(element);
-        let elementScrollTrigger = null;
-        Object.values(elementData).forEach((value) => {
-          Object.values(value).forEach((val) => {
-            if (val.scrollTrigger) {
-              elementScrollTrigger = val.scrollTrigger;
-              delete val.scrollTrigger;
-            }
-          });
-        });
-        elements.set(element, elementData);
-        const timelineData = elementScrollTrigger
-          ? { scrollTrigger: elementScrollTrigger }
-          : {};
-        let defaults = {};
-        if (state.defaults?.tl) {
-          defaults = parseToObject(state.defaults.tl, true, element);
-        }
-        const mergedData = {};
-        mergeDeep(mergedData, defaults, timelineData);
-        addOrReplaceTimeline({
-          breakpoint: timelineMatchMedia || defaultBp,
-          data: timelineData as GlazeAnimationObject,
-          elements,
-          id: id || timeline?.id || getId(),
-          timelineElement: element,
-          timeline: gsap.timeline({ ...mergedData, paused: true }),
-        });
-      }
-    });
-
-    console.log("breakpoints:", breakpoints);
-    console.log("timelines:", timelines);
-  }
-
-  function applyAnimationSet(
-    element: Element,
-    data: GlazeAnimationObject,
-    timeline: gsap.core.Timeline,
-  ) {
-    const tlValue = data.tl ? Object.values(data.tl)?.[0] : undefined;
-
-    if (data.to && data.from) {
-      timeline.fromTo(
-        getSelectorOrElement(element, data),
-        data.from,
-        data.to,
-        tlValue,
-      );
-      return;
-    }
-    if (data.to || data.from) {
-      const key = data.to ? "to" : "from";
-      timeline[key](getSelectorOrElement(element, data), data[key], tlValue);
-    }
-  }
-
-  function reset(timeline: GlazeTimeline) {
-    timeline.elements.forEach(
-      (data: GlazeAnimationObject, element: Element) => {
-        gsap.set(element, {
-          clearProps: "all",
-        });
-        Object.values(data).forEach((data) => {
-          if (data.selector) {
-            gsap.set(getSelectorOrElement(element, data), {
-              clearProps: "all",
-            });
-          }
-        });
-      },
-    );
-  }
-
-  function start(els = getElements(), id = "") {
-    collect(els, id);
-
-    const mm: gsap.MatchMedia = gsap.matchMedia();
-
-    mm.add(
-      Object.fromEntries(
-        Object.values({
-          ...{ [defaultBp]: defaultBp },
-          ...(breakpoints || {}),
-        }).map((key) => [key, key]),
-      ),
-      (context) => {
-        const resettedIds: string[] = [];
-
-        const timelinesToProcess = (id
-          ? [timelines.find((timeline) => timeline.id === id)]
-          : timelines) as GlazeTimeline[];
-
-        const allElements = new Map();
-        for (const timeline of timelinesToProcess) {
-          for (const [key, value] of timeline.elements) {
-            allElements.set(key, value);
-          }
-        }
-
-        allElements.forEach((value, element) => {
-            const animationObject = {};
-
-            Object.entries(value).forEach(([key, value]) => {
-              if (context.conditions?.[key]) {
-                mergeDeep(animationObject, value as PlainObject);
-              }
-            });
-
-            if (state?.defaults?.element) {
-              mergeDeep(
-                animationObject,
-                parseToObject(state.defaults.element, false, element),
-              );
-            }
-
-            const timeline = findTimelineByElements(element);
-            if (!timeline) return;
-
-            if (!resettedIds.includes(timeline.id)) {
-              resettedIds.push(timeline.id);
-              timeline.timeline.progress(0).clear();
-              reset(timeline);
-            }
-
-            applyAnimationSet(element, animationObject, timeline.timeline);
-
-            if (
-              !timeline.timeline.scrollTrigger ||
-              timeline.timeline.scrollTrigger?.isActive
-            ) {
-              timeline.timeline.restart();
-            }
-          });
-
-        return () => {
-          for (const timeline of timelines) {
-            reset(timeline);
-          }
-        };
-      },
-    );
-  }
-
-  start();
-  if (state.watch) watch();
-
-  return {
-    breakpoints,
-    state,
-    timelines,
-  };
+  return { breakpoints, state, timelines, refresh, destroy }
 }
 
-export default glaze;
+function sameSettings(left: unknown, right: unknown): boolean {
+  if (Object.is(left, right)) return true
+  if (!isObject(left) || !isObject(right)) return false
+  const keys = Object.keys(left)
+  return (
+    keys.length === Object.keys(right).length &&
+    keys.every(
+      (key) => Object.hasOwn(right, key) && sameSettings(left[key], right[key])
+    )
+  )
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+export default glaze
 export type {
   GlazeAnimationCollection,
   GlazeAnimationObject,
   GlazeConfig,
+  GlazeInstance,
+  GlazeObjectSettings,
+  GlazeOptions,
+  GlazeState,
   GlazeTimeline,
   PlainObject,
-};
+} from "./types.ts"
+export type { GlazeAdapter } from "@glazejs/shared"

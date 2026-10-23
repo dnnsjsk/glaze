@@ -17,10 +17,10 @@ There is no special syntax needed to use [ScrollTrigger](https://gsap.com/docs/v
 First, register ScrollTrigger with GSAP:
 
 ```js
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import gsap from "gsap"
+import ScrollTrigger from "gsap/ScrollTrigger"
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
 ```
 
 Then initialize Glaze as usual.
@@ -30,9 +30,7 @@ Then initialize Glaze as usual.
 Add `scrollTrigger.*` properties to your animation:
 
 ```html
-<div
-  data-animate="from:opacity-0|y-50|scrollTrigger.trigger-[&]"
-></div>
+<div data-animate="from:opacity-0|y-50|scrollTrigger.trigger-[&]"></div>
 ```
 
 The `[&]` means "use this element as the trigger" (same as the `&` in selectors).
@@ -60,7 +58,6 @@ To scroll-trigger every element at once, set it in the [timeline defaults](/docs
 ></div>
 ```
 
-
 ```html preview
 <div class="flex h-[50vh] items-center">
   <div
@@ -70,13 +67,12 @@ To scroll-trigger every element at once, set it in the [timeline defaults](/docs
 </div>
 ```
 
-
-| Option | What it does |
-|--------|--------------|
-| `scrollTrigger.trigger-[&]` | Element that triggers the animation |
+| Option                             | What it does                                         |
+| ---------------------------------- | ---------------------------------------------------- |
+| `scrollTrigger.trigger-[&]`        | Element that triggers the animation                  |
 | `scrollTrigger.start-[top_center]` | When to start (element position + viewport position) |
-| `scrollTrigger.end-[bottom_top]` | When to end |
-| `scrollTrigger.scrub-true` | Link animation progress to scroll position |
-| `scrollTrigger.markers-true` | Show debug markers (helpful during dev) |
+| `scrollTrigger.end-[bottom_top]`   | When to end                                          |
+| `scrollTrigger.scrub-true`         | Link animation progress to scroll position           |
+| `scrollTrigger.markers-true`       | Show debug markers (helpful during dev)              |
 
 Remember to use underscores instead of spaces in values: `[top_center]` not `[top center]`.

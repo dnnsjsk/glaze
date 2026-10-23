@@ -1,21 +1,46 @@
 {
-  "name": "glaze-monorepo",
+  "name": "@glazejs/workspace",
   "private": true,
-  "packageManager": "bun@1.2.22",
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=26.12.0",
+    "pnpm": ">=12.14.0"
+  },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
-    "dev": "bun run --cwd packages/core dev",
-    "build": "bun run --cwd packages/core build",
-    "test": "bun run --cwd packages/core test",
-    "lint": "biome lint .",
-    "format": "biome format --write .",
-    "check": "biome check .",
-    "typecheck": "tsc --noEmit -p packages/core/tsconfig.json"
+    "setup": "pnpm install --frozen-lockfile && pnpm exec playwright install chromium",
+    "dev": "pnpm --filter @glazejs/playground dev",
+    "build": "pnpm -r build",
+    "format": "oxfmt . --write",
+    "format:check": "oxfmt . --check",
+    "lint": "oxlint . --max-warnings=0 && pnpm audit:workspace && pnpm audit:docs",
+    "lint:fix": "oxlint . --fix --max-warnings=0 && pnpm audit:workspace && pnpm audit:docs",
+    "typecheck": "tsc-rs --noEmit -p tsconfig.json && pnpm -r typecheck",
+    "test": "pnpm test:unit && pnpm test:tooling",
+    "test:unit": "pnpm --filter glazejs test",
+    "test:tooling": "node --test scripts/*.test.ts scripts/oxlint-plugins/*.test.ts",
+    "test:e2e": "playwright test",
+    "audit:workspace": "node scripts/check-workspace.ts",
+    "audit:docs": "node scripts/check-docs-content.ts --root docs --expected-docs 11 --expected-nav 1",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "verify": "pnpm check && pnpm test:e2e && pnpm test:package",
+    "test:package": "node scripts/check-package.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
-    "typescript": "^5.9.3"
+    "@oxlint/plugins": "catalog:",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "tsc-rs": "catalog:",
+    "typescript": "catalog:",
+    "yaml": "catalog:"
   }
 }

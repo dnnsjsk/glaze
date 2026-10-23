@@ -1,12 +1,9 @@
-# dependencies
-/node_modules
-**/node_modules
-.bun/
-
-# misc
+node_modules/
+**/dist/
+coverage/
+playwright-report/
+test-results/
+*.tgz
 .DS_Store
-
-# intellij
 .idea/
-
-test-results
+packages/core/LICENSE

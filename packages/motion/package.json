@@ -1,0 +1,20 @@
+{
+  "name": "@glazejs/motion",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Motion adapter for Glaze animations.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc-rs --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@glazejs/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "motion": "catalog:"
+  }
+}

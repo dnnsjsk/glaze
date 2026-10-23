@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Glaze · Animation playground</title>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Glaze playground</p>
+      <h1>One syntax.<br />Your animation engine.</h1>
+      <p class="intro">
+        Try the same declarative animations with GSAP or Motion.
+      </p>
+      <form aria-label="Animation controls">
+        <label for="engine">Engine</label>
+        <select id="engine">
+          <option value="gsap">GSAP</option>
+          <option value="motion">Motion</option>
+        </select>
+        <button type="button" id="replay">Replay</button>
+        <button type="button" id="reset">Reset</button>
+      </form>
+      <section id="examples" aria-label="Animation examples">
+        <article>
+          <p>01 / Fade and rise</p>
+          <div class="stage">
+            <div
+              class="tile coral"
+              data-animate="from:opacity-0|y-28|duration-0.7"
+            ></div>
+          </div>
+          <code>from:opacity-0|y-28|duration-0.7</code>
+        </article>
+        <article>
+          <p>02 / Move across</p>
+          <div class="stage">
+            <div
+              class="tile blue"
+              data-animate="to:x-120|rotate-90|duration-0.8"
+            ></div>
+          </div>
+          <code>to:x-120|rotate-90|duration-0.8</code>
+        </article>
+        <article>
+          <p>03 / Responsive preset</p>
+          <div class="stage">
+            <div class="tile gold" data-animate="@wide:preset-spin"></div>
+          </div>
+          <code>@wide:preset-spin</code><small>Active above 640px.</small>
+        </article>
+      </section>
+      <p id="status" role="status"></p>
+      <footer>
+        <a href="https://github.com/inline0/glaze">Source and documentation</a
+        ><a href="/legacy/">Legacy GSAP compatibility examples</a>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

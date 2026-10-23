@@ -1,5 +1,39 @@
 # Changelog
 
+## [2.1.0] - Unreleased
+
+### Added
+
+- A Motion adapter and explicit GSAP adapter, published through `glazejs/motion`
+  and `glazejs/gsap`. Shared, private workspace packages keep engine contracts
+  separate from parsing and orchestration. (#10)
+- `refresh()` and `destroy()` instance lifecycle methods, including responsive
+  listener, animation and mutation-observer cleanup.
+- A real workspace playground, frozen pnpm catalog, Node 26 development pins,
+  shared Oxlint/Oxfmt tooling, CI and production consumer checks.
+
+### Fixed
+
+- Responsive preset calls such as `@md:preset-fadeIn` work in attributes and
+  class syntax. Nested presets preserve invocation order and reject cycles. (#13)
+- Bare and state-specific element defaults apply before explicit animation
+  values and do not create states that the element did not request. (#16)
+- Normal initialization and watch-mode rebuilds produce no debug logs. (#15)
+- Add public ESM exports, bundled declarations, optional engine peers and
+  corrected repository metadata to the production package. (#17)
+- Installation examples initialize once with all options and explain cleanup. (#8)
+- Reject prototype-modifying utility paths before parsing nested properties.
+- Preserve responsive utility order, assign nested timeline children once, and
+  apply ScrollTrigger only when its breakpoint matches.
+- Stop all engine work after responsive rebuild errors and ignore unrelated
+  DOM mutations in watch mode.
+
+### Changed
+
+- Presets expand in place: later utility values override earlier values.
+- Remove obsolete screenshots, generated bundles, Bun/Biome configuration and
+  nested lockfiles. The GSAP entry keeps the `dist/index.es.js` compatibility path.
+
 ## 2.0.1
 
 2024-06-05

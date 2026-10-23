@@ -1,0 +1,31 @@
+name: Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - uses: pnpm/action-setup@v6.1.0
+      - name: Install dependencies and browser
+        run: pnpm run setup --with-deps
+      - name: Verify workspace and published package
+        run: pnpm verify
+      - name: Audit production dependencies
+        run: pnpm audit --prod

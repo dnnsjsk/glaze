@@ -1,53 +1,24 @@
-import { defineConfig, type ViteDevServer } from "vite";
-import dts from "vite-plugin-dts";
-import { resolve } from "node:path";
-
-const removeConsolePlugin = () => {
-  return {
-    name: "remove-console", // name of the plugin
-    renderChunk(code: string) {
-      return code.replace(/console\.log\(.*\);?/g, "");
-    },
-  };
-};
-
-const forceFullReloadPlugin = () => {
-  return {
-    name: "force-full-reload",
-    handleHotUpdate({ file, server }: { file: string; server: ViteDevServer }) {
-      if (file.endsWith(".ts")) {
-        server.ws.send({
-          type: "full-reload",
-          path: "*",
-        });
-      }
-    },
-  };
-};
+import { fileURLToPath } from "node:url"
+import { dts } from "rolldown-plugin-dts"
+import { defineConfig } from "vite"
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@": resolve(__dirname, "./src"),
-    },
-  },
+  plugins: [dts({ tsconfig: "../../tsconfig.build.json" })],
+  oxc: { exclude: [/\.js$/, /\.d\.[cm]?ts$/] },
   build: {
+    target: "es2022",
     lib: {
-      entry: "./src/index.ts",
-      name: "Glaze",
-      fileName: (format) => `index.${format}.js`,
+      entry: {
+        index: fileURLToPath(new URL("./src/index.ts", import.meta.url)),
+        gsap: fileURLToPath(new URL("./src/gsap.ts", import.meta.url)),
+        motion: fileURLToPath(new URL("./src/motion.ts", import.meta.url)),
+      },
       formats: ["es"],
+      fileName: (_format, name) =>
+        name.endsWith(".d") ? `${name}.ts` : `${name}.es.js`,
     },
-    rollupOptions: {
-      external: ["gsap"],
+    rolldownOptions: {
+      external: [/^gsap(?:\/|$)/, /^motion(?:\/|$)/],
     },
-    minify: "esbuild",
   },
-  plugins: [
-    removeConsolePlugin(),
-    forceFullReloadPlugin(),
-    dts({
-      include: ["./src/index.ts"],
-    }),
-  ],
-});
+})

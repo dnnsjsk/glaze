@@ -1,0 +1,17 @@
+{
+  "name": "@glazejs/gsap",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "GSAP adapter for Glaze animations.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc-rs --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@glazejs/shared": "workspace:*"
+  }
+}

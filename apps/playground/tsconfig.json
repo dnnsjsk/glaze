@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "paths": {
+      "glazejs": ["../../packages/core/src/index.ts"],
+      "glazejs/gsap": ["../../packages/core/src/gsap.ts"],
+      "glazejs/motion": ["../../packages/core/src/motion.ts"]
+    }
+  },
+  "include": ["src", "legacy", "vite.config.ts"]
+}

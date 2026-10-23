@@ -8,6 +8,7 @@
     "selectors",
     "breakpoints",
     "timelines",
+    "motion",
     "scrolltrigger",
     "defaults",
     "presets",

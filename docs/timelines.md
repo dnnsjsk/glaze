@@ -10,7 +10,10 @@ meta_description: "Chain animations together"
 
 # Timelines
 
-GSAP [Timelines](https://gsap.com/docs/v3/GSAP/Timeline) let you chain animations together. Glaze supports them with the `tl` keyword.
+Use `tl` to chain animations. The GSAP adapter creates native
+[timelines](https://gsap.com/docs/v3/GSAP/Timeline), and the Motion adapter creates
+Motion sequences. The examples below use GSAP; see the [Motion guide](/docs/motion)
+for its supported easing and timeline settings.
 
 ## Basic timeline
 
@@ -48,9 +51,11 @@ Adjust when child animations start using `tl:`:
 </div>
 ```
 
-
 ```html preview
-<div class="grid gap-8" data-animate="tl defaults:ease-elastic|duration-4 scrollTrigger:trigger-[&]">
+<div
+  class="grid gap-8"
+  data-animate="tl defaults:ease-elastic|duration-4 scrollTrigger:trigger-[&]"
+>
   <div
     class="h-20 w-20 rounded-xl bg-amber-500"
     data-animate="to:rotate-360"
@@ -62,10 +67,10 @@ Adjust when child animations start using `tl:`:
 </div>
 ```
 
-
 `tl:[-=3]` means "start 3 seconds before the previous animation ends" (overlap).
 
 Common timing values:
+
 - `tl:[+=1]` - Start 1 second after previous ends
 - `tl:[-=1]` - Start 1 second before previous ends (overlap)
 - `tl:[<]` - Start at same time as previous
@@ -81,9 +86,11 @@ Combine breakpoints with timelines:
 </div>
 ```
 
-
 ```html preview
-<div class="grid gap-8" data-animate="tl defaults:ease-power2.inOut|duration-2 scrollTrigger:trigger-[&]">
+<div
+  class="grid gap-8"
+  data-animate="tl defaults:ease-power2.inOut|duration-2 scrollTrigger:trigger-[&]"
+>
   <div
     class="h-20 w-20 rounded-xl bg-amber-500"
     data-animate="to:rotate-360 @lg:to:xPercent-[100]"
@@ -94,7 +101,6 @@ Combine breakpoints with timelines:
   ></div>
 </div>
 ```
-
 
 The rotation always happens, but the horizontal movement only kicks in on large screens.
 
@@ -108,11 +114,8 @@ Give your timeline a name to reference it from anywhere:
 </div>
 
 <!-- Somewhere else in the DOM -->
-<div data-animate="tl:main-[-=1] to:scale-1.5">
-  ...
-</div>
+<div data-animate="tl:main-[-=1] to:scale-1.5">...</div>
 ```
-
 
 ```html preview
 <div class="grid w-full grid-cols-2 justify-items-center">
@@ -138,6 +141,5 @@ Give your timeline a name to reference it from anywhere:
   </div>
 </div>
 ```
-
 
 Use `tl/name` to create a named timeline, and `tl:name` to join it.

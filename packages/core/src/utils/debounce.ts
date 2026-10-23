@@ -1,18 +1,24 @@
-function debounce<T extends (...args: any[]) => void>(
-  func: T,
-  wait: number,
-): T {
-  let timeoutId: number | null = null;
+/**
+ * Delay a callback until calls have stopped for the requested interval.
+ * @param func - The callback to invoke with the latest arguments.
+ * @param wait - The quiet interval in milliseconds.
+ * @returns A debounced callback with the same arguments.
+ */
+function debounce<Arguments extends unknown[]>(
+  func: (...args: Arguments) => void,
+  wait: number
+): (...args: Arguments) => void {
+  let timeoutId: number | null = null
 
-  return ((...args: Parameters<T>): void => {
+  return (...args: Arguments): void => {
     if (timeoutId !== null) {
-      clearTimeout(timeoutId);
+      clearTimeout(timeoutId)
     }
 
     timeoutId = window.setTimeout(() => {
-      func(...args);
-    }, wait);
-  }) as T;
+      func(...args)
+    }, wait)
+  }
 }
 
-export default debounce;
+export default debounce

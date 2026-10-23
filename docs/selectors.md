@@ -20,7 +20,7 @@ Use a different data attribute:
 glaze({
   lib: { gsap: { core: gsap } },
   dataAttribute: "data-move",
-});
+})
 ```
 
 Now Glaze will look for `data-move` instead of `data-animate`:
@@ -37,7 +37,7 @@ Prefer classes over data attributes? Enable class mode:
 glaze({
   lib: { gsap: { core: gsap } },
   className: "animate",
-});
+})
 ```
 
 Now you can write animations as classes:
@@ -65,5 +65,5 @@ Glaze searches the whole `document` by default. Pass `element` to only animate e
 glaze({
   lib: { gsap: { core: gsap } },
   element: document.querySelector("#app"),
-});
+})
 ```

@@ -1,0 +1,14 @@
+{
+  "name": "@glazejs/shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Engine-neutral animation contracts for Glaze.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc-rs --noEmit -p tsconfig.json"
+  }
+}

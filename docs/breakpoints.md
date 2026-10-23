@@ -10,7 +10,10 @@ meta_description: "Responsive animations with media queries"
 
 # Breakpoints
 
-Glaze uses GSAP's [matchMedia](https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/) under the hood, so your animations can respond to screen size changes.
+Glaze responds to media-query changes through its chosen adapter. GSAP uses its
+[matchMedia](<https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/>) context; Motion uses
+native media-query listeners. Both rebuild animations and clean up previous
+styles when the matching queries change.
 
 ## Setup
 
@@ -25,7 +28,7 @@ glaze({
     md: "(min-width: 768px)",
     lg: "(min-width: 1024px)",
   },
-});
+})
 ```
 
 The `default` breakpoint runs when no other breakpoint is specified. If you don't set one, it defaults to `(min-width: 1px)`.
@@ -43,14 +46,12 @@ Add `@breakpoint:` before your animation:
 ></div>
 ```
 
-
 ```html preview
 <div
   class="h-20 w-20 rounded-xl bg-lime-500 lg:invisible"
   data-animate="@lg:from:duration-1|autoAlpha-0|rotate-360|xPercent-[-100]|ease-power2.inOut|scrollTrigger.trigger-[&]"
 ></div>
 ```
-
 
 This animation only runs on `lg` screens (1024px+).
 
@@ -59,13 +60,10 @@ This animation only runs on `lg` screens (1024px+).
 Stack multiple breakpoints by separating them with spaces:
 
 ```html
-<div
-  data-animate="@sm:from:opacity-0|y-50 @lg:from:scale-0.5"
-></div>
+<div data-animate="@sm:from:opacity-0|y-50 @lg:from:scale-0.5"></div>
 ```
 
 On small screens, it fades in from below. On large screens, it also scales up.
-
 
 ```html preview
 <div
@@ -73,6 +71,5 @@ On small screens, it fades in from below. On large screens, it also scales up.
   data-animate="@sm:from:duration-1|autoAlpha-0|rotate-360|xPercent-[-100]|ease-power2.inOut|scrollTrigger.trigger-[&] @lg:from:background-[red]"
 ></div>
 ```
-
 
 The animations combine - every breakpoint whose media query matches contributes its properties. When two matching breakpoints set the same property, the one written later in the string wins, regardless of screen size. Write breakpoints from small to large, as above, so that larger breakpoints override smaller ones.

@@ -1,40 +1,36 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import glaze from "../../src/index.ts";
-import { gsap } from "gsap";
+import { gsap } from "gsap"
+import {
+  describe,
+  it,
+  expect,
+  expectTypeOf,
+  beforeEach,
+  afterEach,
+  vi,
+} from "vitest"
+import glaze from "../../src/index.ts"
 
 vi.mock("gsap", () => {
   return {
     gsap: {
       to: vi.fn(),
       from: vi.fn(),
-      timeline: vi.fn(),
+      timeline: vi.fn(() => ({
+        clear: vi.fn(),
+        progress: vi.fn(),
+        restart: vi.fn(),
+        kill: vi.fn(),
+      })),
       matchMedia: () => ({
         add: vi.fn(),
       }),
     },
-  };
-});
-
-expect.extend({
-  toBeArrayOfSize(received, expected) {
-    if (Array.isArray(received) && received.length === expected) {
-      return {
-        message: () => `expected array is of length ${expected}`,
-        pass: true,
-      };
-    } else {
-      return {
-        message: () =>
-          `expected array of length ${expected} but received ${received.length}`,
-        pass: false,
-      };
-    }
-  },
-});
+  }
+})
 
 describe("glaze", () => {
-  let container: HTMLElement;
-  let glazeInstance: ReturnType<typeof glaze>;
+  let container: HTMLElement
+  let glazeInstance: ReturnType<typeof glaze>
 
   beforeEach(() => {
     document.body.innerHTML = `
@@ -68,8 +64,8 @@ describe("glaze", () => {
           <div class="box"></div>
         </div>
       </div>
-    `;
-    container = document.getElementById("test-container") as HTMLElement;
+    `
+    container = document.getElementById("test-container") as HTMLElement
     glazeInstance = glaze({
       lib: { gsap: { core: gsap } },
       breakpoints: {
@@ -85,44 +81,56 @@ describe("glaze", () => {
       defaults: {
         tl: "defaults:duration-3",
       },
-    });
-  });
+    })
+  })
+
+  afterEach(() => {
+    glazeInstance.destroy()
+  })
+
+  it("preserves native GSAP timeline typing for the compatibility API", () => {
+    const native = glaze({ lib: { gsap: { core: gsap } }, element: container })
+    expectTypeOf(
+      native.timelines[0].timeline
+    ).toEqualTypeOf<gsap.core.Timeline>()
+    native.destroy()
+  })
 
   it("throws an error if GSAP is not provided", () => {
     // @ts-expect-error - Testing error when GSAP is not provided
-    expect(() => glaze()).toThrow("GSAP not found");
-  });
+    expect(() => glaze()).toThrow("GSAP not found")
+  })
 
   it("returns correct base element", () => {
-    expect(glazeInstance.state.element).toBe(container);
-  });
+    expect(glazeInstance.state.element).toBe(container)
+  })
 
   it("returns correct default breakpoint", () => {
-    expect(glazeInstance.breakpoints.default).toEqual("(min-width: 640px)");
-  });
+    expect(glazeInstance.breakpoints.default).toEqual("(min-width: 640px)")
+  })
 
   it("returns correct breakpoints", () => {
     const result = {
       default: "(min-width: 640px)",
       lg: "(min-width: 1024px)",
-    };
-    expect(glazeInstance.breakpoints).toEqual(result);
-  });
+    }
+    expect(glazeInstance.breakpoints).toEqual(result)
+  })
 
   it("returns correct elements", () => {
     expect(
-      glazeInstance.timelines.flatMap((tl) => Array.from(tl.elements.keys())),
-    ).toHaveLength(12);
-  });
+      glazeInstance.timelines.flatMap((tl) => Array.from(tl.elements.keys()))
+    ).toHaveLength(12)
+  })
 
   it("return correct preset element", () => {
-    const tl = glazeInstance.timelines[2];
-    if (!tl) throw new Error("Timeline not found");
+    const tl = glazeInstance.timelines[2]
+    if (!tl) throw new Error("Timeline not found")
 
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
+    const elements = Array.from(tl.elements.keys())
+    const values = Array.from(tl.elements.values())
 
-    expect(elements).toHaveLength(1);
+    expect(elements).toHaveLength(1)
     expect(values[0]).toStrictEqual({
       "(min-width: 640px)": {
         from: {
@@ -135,24 +143,24 @@ describe("glaze", () => {
           duration: 3,
         },
       },
-    });
-  });
+    })
+  })
 
   it("returns correct main timeline", () => {
-    const tl = glazeInstance.timelines.find((tl) => tl.id === "main");
-    if (!tl) throw new Error("Timeline not found");
+    const tl = glazeInstance.timelines.find((tl) => tl.id === "main")
+    if (!tl) throw new Error("Timeline not found")
 
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
+    const elements = Array.from(tl.elements.keys())
+    const values = Array.from(tl.elements.values())
 
-    expect(tl.id).toBe("main");
+    expect(tl.id).toBe("main")
     expect(tl.data).toEqual({
       defaults: {
         duration: 3,
         ease: "power2.inOut",
       },
-    });
-    expect(elements).toHaveLength(5);
+    })
+    expect(elements).toHaveLength(5)
     expect(values[0]).toStrictEqual({
       "(min-width: 640px)": {
         to: {
@@ -160,7 +168,7 @@ describe("glaze", () => {
           background: "red",
         },
       },
-    });
+    })
     expect(values[1]).toStrictEqual({
       "(min-width: 640px)": {
         tl: {
@@ -171,7 +179,7 @@ describe("glaze", () => {
           background: "red",
         },
       },
-    });
+    })
     expect(values[2]).toStrictEqual({
       "(min-width: 640px)": {
         tl: { main: undefined },
@@ -180,7 +188,7 @@ describe("glaze", () => {
           background: "red",
         },
       },
-    });
+    })
     expect(values[3]).toStrictEqual({
       "(min-width: 640px)": {
         tl: {
@@ -191,7 +199,7 @@ describe("glaze", () => {
           background: "red",
         },
       },
-    });
+    })
     expect(values[4]).toStrictEqual({
       "(min-width: 640px)": {
         to: {
@@ -202,23 +210,23 @@ describe("glaze", () => {
           main: "-=2",
         },
       },
-    });
-  });
+    })
+  })
 
   it("returns correct second timeline", () => {
-    const tl = glazeInstance.timelines[1];
-    if (!tl) throw new Error("Timeline not found");
+    const tl = glazeInstance.timelines[1]
+    if (!tl) throw new Error("Timeline not found")
 
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
+    const elements = Array.from(tl.elements.keys())
+    const values = Array.from(tl.elements.values())
 
     expect(tl.data).toStrictEqual({
       defaults: {
         duration: 3,
         ease: "power2.inOut",
       },
-    });
-    expect(elements).toHaveLength(2);
+    })
+    expect(elements).toHaveLength(2)
     expect(values[0]).toStrictEqual({
       "(min-width: 640px)": {
         to: {
@@ -226,7 +234,7 @@ describe("glaze", () => {
           background: "blue",
         },
       },
-    });
+    })
     expect(values[1]).toStrictEqual({
       "(min-width: 640px)": {
         tl: {
@@ -242,18 +250,18 @@ describe("glaze", () => {
           background: "navy",
         },
       },
-    });
-  });
+    })
+  })
 
   it("returns correct third timeline", () => {
-    const tl = glazeInstance.timelines[3];
-    if (!tl) throw new Error("Timeline not found");
+    const tl = glazeInstance.timelines[3]
+    if (!tl) throw new Error("Timeline not found")
 
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
+    const elements = Array.from(tl.elements.keys())
+    const values = Array.from(tl.elements.values())
 
-    expect(tl.data).toStrictEqual({});
-    expect(elements).toHaveLength(1);
+    expect(tl.data).toStrictEqual({})
+    expect(elements).toHaveLength(1)
     expect(values[0]).toStrictEqual({
       "(min-width: 640px)": {
         to: {
@@ -263,18 +271,18 @@ describe("glaze", () => {
           ease: "power2.inOut",
         },
       },
-    });
-  });
+    })
+  })
 
   it("returns correct fourth timeline", () => {
-    const tl = glazeInstance.timelines[4];
-    if (!tl) throw new Error("Timeline not found");
+    const tl = glazeInstance.timelines[4]
+    if (!tl) throw new Error("Timeline not found")
 
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
+    const elements = Array.from(tl.elements.keys())
+    const values = Array.from(tl.elements.values())
 
-    expect(tl.data).toStrictEqual({});
-    expect(elements).toHaveLength(1);
+    expect(tl.data).toStrictEqual({})
+    expect(elements).toHaveLength(1)
     expect(values[0]).toStrictEqual({
       "(min-width: 640px)": {
         to: {
@@ -289,18 +297,18 @@ describe("glaze", () => {
           background: "purple",
         },
       },
-    });
-  });
+    })
+  })
 
   it("returns correct fifth timeline", () => {
-    const tl = glazeInstance.timelines[5];
-    if (!tl) throw new Error("Timeline not found");
+    const tl = glazeInstance.timelines[5]
+    if (!tl) throw new Error("Timeline not found")
 
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
+    const elements = Array.from(tl.elements.keys())
+    const values = Array.from(tl.elements.values())
 
-    expect(tl.data).toStrictEqual({});
-    expect(elements).toHaveLength(1);
+    expect(tl.data).toStrictEqual({})
+    expect(elements).toHaveLength(1)
     expect(values[0]).toStrictEqual({
       "(min-width: 640px)": {
         to: {
@@ -315,18 +323,18 @@ describe("glaze", () => {
           background: "purple",
         },
       },
-    });
-  });
+    })
+  })
 
   it("returns correct sixth timeline", () => {
-    const tl = glazeInstance.timelines[6];
-    if (!tl) throw new Error("Timeline not found");
+    const tl = glazeInstance.timelines[6]
+    if (!tl) throw new Error("Timeline not found")
 
-    const elements = Array.from(tl.elements.keys());
-    const values = Array.from(tl.elements.values());
+    const elements = Array.from(tl.elements.keys())
+    const values = Array.from(tl.elements.values())
 
-    expect(tl.data).toStrictEqual({});
-    expect(elements).toHaveLength(1);
+    expect(tl.data).toStrictEqual({})
+    expect(elements).toHaveLength(1)
     expect(values[0]).toStrictEqual({
       "(min-width: 1024px)": {
         selector: {
@@ -340,6 +348,6 @@ describe("glaze", () => {
           ease: "power2.inOut",
         },
       },
-    });
-  });
-});
+    })
+  })
+})

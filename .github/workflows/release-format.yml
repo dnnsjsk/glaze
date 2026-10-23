@@ -1,0 +1,44 @@
+name: Release format
+
+on:
+  release:
+    types: [published, edited]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-format-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  normalize:
+    name: Normalize release title and notes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Apply the shared release format
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          encoded_tag="$(jq -rn --arg tag "$RELEASE_TAG" '$tag | @uri')"
+          release="$(gh api "repos/$GH_REPO/releases/tags/$encoded_tag")"
+          release_id="$(jq -er '.id' <<< "$release")"
+          notes="See [CHANGELOG.md](https://github.com/$GH_REPO/blob/main/CHANGELOG.md) for the full release notes for \`$RELEASE_TAG\`."
+          if jq -e --arg name "$RELEASE_TAG" --arg body "$notes" \
+            '.name == $name and .body == $body' <<< "$release" >/dev/null; then
+            echo "Release $RELEASE_TAG already uses the shared format."
+            exit 0
+          fi
+          gh api --method PATCH "repos/$GH_REPO/releases/$release_id" \
+            -f name="$RELEASE_TAG" -f body="$notes" --silent

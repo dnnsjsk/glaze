@@ -1,0 +1,132 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #202521;
+  background: #f7f7f2;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 64px 28px;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 12px;
+}
+h1 {
+  font-size: clamp(40px, 7vw, 76px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  margin: 28px 0;
+}
+.intro {
+  color: #626862;
+  font-size: 18px;
+}
+form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 36px 0;
+}
+button,
+select {
+  font: inherit;
+  color: inherit;
+  padding: 10px 18px;
+  border: 1px solid #c7ccc2;
+  border-radius: 6px;
+  background: white;
+}
+button {
+  cursor: pointer;
+}
+button:hover {
+  background: #e9ede4;
+}
+button:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid #2966de;
+  outline-offset: 3px;
+}
+section {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid #d1d5ca;
+  border-bottom: 1px solid #d1d5ca;
+}
+article {
+  padding: 24px 20px 28px;
+  min-width: 0;
+}
+article + article {
+  border-left: 1px solid #d1d5ca;
+}
+article p {
+  font-size: 13px;
+}
+.stage {
+  height: 160px;
+  display: flex;
+  align-items: center;
+}
+.tile {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+}
+.coral {
+  background: #f17b61;
+}
+.blue {
+  background: #6088ed;
+}
+.gold {
+  background: #e4bb46;
+}
+code {
+  display: block;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+small {
+  display: block;
+  color: #626862;
+  margin-top: 8px;
+}
+#status {
+  min-height: 24px;
+  font-size: 14px;
+  margin-top: 24px;
+}
+footer {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 48px;
+  font-size: 13px;
+}
+a {
+  color: inherit;
+  text-underline-offset: 4px;
+}
+@media (max-width: 700px) {
+  section {
+    grid-template-columns: 1fr;
+  }
+  article + article {
+    border-left: 0;
+    border-top: 1px solid #d1d5ca;
+  }
+}
